@@ -4,6 +4,7 @@
 ```sh
 nimble install https://github.com/daylinmorgan/tsm
 ```
+*note*: requires `fzf`
 
 ## Prior Art
 

@@ -36,10 +36,19 @@ proc findProjects(): Table[string, string] =
 
 proc listTmuxSessions(): string =
   let (output, code) = execCmdEx("tmux list-sessions -F '#S'")
-  if code != 0: echo &"error checking tmux sessions\nexit code:{code}\n{output}"
+  if code != 0: 
+    echo &"error checking tmux sessions\nexit code:{code}\n{output}"
+    quit 1
   return output
 
+proc checkFzf() =
+  if findExe("fzf") == "":
+    echo "tsm requires fzf"
+    quit 1
+
 when isMainModule:
+  checkFzf()
+
   let projects = findProjects()
   let selected = pickProject(projects)
 
