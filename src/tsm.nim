@@ -23,9 +23,14 @@ proc pickProject(projects: Table[string, string]): string =
 
 proc findProjects(): Table[string, string] =
   ## get a table of possible project paths
+  let tsmDirs = getEnv("TSM_DIRS")
+
+  if tsmDirs == "":
+    echo "Please set $TSM_DIRS to a colon-delimited list of paths"
+    quit 1
 
   var projectPaths: seq[string]
-  for devDir in getEnv("TSM_DIRS").split(":"):
+  for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
       projectPaths.add d.path
 
