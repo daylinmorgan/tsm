@@ -17,6 +17,8 @@ proc pickProject(projects: Table[string, string]): string =
 
   result = readFile(outPath)
   result.stripLineEnd()
+  if result == "":
+    quit errCode
 
   removeFile(inPath)
   removeFile(outPath)
