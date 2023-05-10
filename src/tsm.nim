@@ -12,13 +12,13 @@ proc pickProject(projects: Table[string, string]): string =
   let errCode = execCmd("fzf < " & inPath & " > " & outPath)
   close outFile
 
-  removeFile(inPath)
-  removeFile(outPath)
-
   if errCode != 0: echo &"fzf exited with code: {errCode}"
 
   result = readFile(outPath)
   result.stripLineEnd()
+
+  removeFile(inPath)
+  removeFile(outPath)
 
 proc findProjects(): Table[string, string] =
   ## get a table of possible project paths
