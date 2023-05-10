@@ -10,7 +10,7 @@ proc pickProject(projects: Table[string, string]): string =
   inputFile.write collect(for k in projects.keys(): k).join("\n")
   close inputFile
 
-  let errCode = execCmd(&"fzf {FZF_ARGS} < {inPath}  > {outPath}")
+  let errCode = execCmd(&"fzf {FZF_ARGS} < {inPath} > {outPath}")
   close outFile
 
   if errCode != 0: echo &"fzf exited with code: {errCode}"
@@ -58,4 +58,3 @@ when isMainModule:
       discard execCmd(&"tmux new-session -s {selected} -c {projects[selected]}")
     else:
       discard execCmd(&"tmux attach -t {selected}")
-
