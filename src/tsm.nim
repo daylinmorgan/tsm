@@ -1,6 +1,6 @@
 import std/[os, osproc, strformat, strutils, sugar, tables, tempfiles]
 
-const FZF_ARGS = "--height 100%"
+const FZF_ARGS = "--border-label='TSM: Tmux Session Manager'"
 
 proc pickProject(projects: Table[string, string]): string =
   ## use fzf as a selector for the project
