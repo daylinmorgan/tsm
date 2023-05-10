@@ -1,5 +1,6 @@
 import std/[os, osproc, strformat, strutils, sugar, tables, tempfiles]
 
+const FZF_ARGS = "--height 100%"
 
 proc pickProject(projects: Table[string, string]): string =
   ## use fzf as a selector for the project
@@ -9,7 +10,7 @@ proc pickProject(projects: Table[string, string]): string =
   inputFile.write collect(for k in projects.keys(): k).join("\n")
   close inputFile
 
-  let errCode = execCmd("fzf < " & inPath & " > " & outPath)
+  let errCode = execCmd(&"fzf {FZF_ARGS} < {inPath}  > {outPath}")
   close outFile
 
   if errCode != 0: echo &"fzf exited with code: {errCode}"
@@ -25,7 +26,6 @@ proc findProjects(): Table[string, string] =
 
   var projectPaths: seq[string]
   for devDir in getEnv("TSM_DIRS").split(":"):
-    echo devDir
     for d in walkDir(devDir):
       projectPaths.add d.path
 
@@ -35,10 +35,7 @@ proc findProjects(): Table[string, string] =
     echo "there may be nonunique entries in the project names"
 
 proc listTmuxSessions(): string =
-  let (output, code) = execCmdEx("tmux list-sessions -F '#S'")
-  if code != 0: 
-    echo &"error checking tmux sessions\nexit code:{code}\n{output}"
-    quit 1
+  let (output, _) = execCmdEx("tmux list-sessions -F '#S'")
   return output
 
 proc checkFzf() =
