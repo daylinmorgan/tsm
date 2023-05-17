@@ -41,9 +41,9 @@ proc findProjects(): Table[string, string] =
   if len(result) != len(projectPaths):
     echo "there may be nonunique entries in the project names"
 
-proc listTmuxSessions(): string =
+proc listTmuxSessions(): seq[string] =
   let (output, _) = execCmdEx("tmux list-sessions -F '#S'")
-  return output
+  return output.splitLines()
 
 proc checkFzf() =
   if findExe("fzf") == "":
