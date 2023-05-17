@@ -1,8 +1,15 @@
-import std/[os, osproc, strformat, strutils, sugar, tables, tempfiles]
+import std/[algorithm, os, osproc, strformat, strutils, sugar, tables, tempfiles, times]
 
 const FZF_ARGS = "--border-label='TSM: Tmux Session Manager'"
 
-proc pickProject(projects: Table[string, string]): string =
+type
+  Project = object
+    location: string
+    updated: Time
+    open: bool # not used yet
+
+
+proc pickProject(projects: OrderedTable[string, Project]): string =
   ## use fzf as a selector for the project
   let (inputFile, inPath) = createTempFile("tsm", "")
   let (outFile, outPath) = createTempFile("tsm", "")
@@ -23,7 +30,7 @@ proc pickProject(projects: Table[string, string]): string =
   removeFile(inPath)
   removeFile(outPath)
 
-proc findProjects(): Table[string, string] =
+proc findProjects(): OrderedTable[string, Project] =
   ## get a table of possible project paths
   let tsmDirs = getEnv("TSM_DIRS")
 
@@ -31,12 +38,17 @@ proc findProjects(): Table[string, string] =
     echo "Please set $TSM_DIRS to a colon-delimited list of paths"
     quit 1
 
-  var projectPaths: seq[string]
+  var projectPaths: seq[Project]
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
-      projectPaths.add d.path
+      projectPaths.add Project(location:d.path, updated: getLastModificationTime(d.path), open: false)
+  
+  projectPaths.sort do (x,y: Project) -> int:
+    cmp(y.updated, x.updated)
 
-  result = collect(for p in projectPaths: {splitPath(p)[1].replace(".", "_"): p})
+  for p in projectPaths:
+    let name = splitPath(p.location)[1].replace(".","_")
+    result[name] = p
 
   if len(result) != len(projectPaths):
     echo "there may be nonunique entries in the project names"
@@ -58,10 +70,10 @@ when isMainModule:
 
   if existsEnv("TMUX"):
     if selected notin listTmuxSessions():
-      discard execCmd(&"tmux new-session -d -s {selected} -c {projects[selected]}")
+      discard execCmd(&"tmux new-session -d -s {selected} -c {projects[selected].location}")
     discard execCmd(&"tmux switch-client -t {selected}")
   else:
     if selected notin listTmuxSessions():
-      discard execCmd(&"tmux new-session -s {selected} -c {projects[selected]}")
+      discard execCmd(&"tmux new-session -s {selected} -c {projects[selected].location}")
     else:
       discard execCmd(&"tmux attach -t {selected}")
