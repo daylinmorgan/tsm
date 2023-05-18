@@ -1,4 +1,5 @@
-import std/[algorithm, os, osproc, strformat, strutils, sugar, tables, tempfiles, times]
+import std/[algorithm, os, osproc, strformat, strutils, sugar, tables,
+    tempfiles, times]
 
 const FZF_ARGS = "--border-label='TSM: Tmux Session Manager'"
 
@@ -41,13 +42,15 @@ proc findProjects(): OrderedTable[string, Project] =
   var projectPaths: seq[Project]
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
-      projectPaths.add Project(location:d.path, updated: getLastModificationTime(d.path), open: false)
+      projectPaths.add Project(location: d.path,
+                               updated: getLastModificationTime(d.path),
+                               open: false)
 
-  projectPaths.sort do (x,y: Project) -> int:
+  projectPaths.sort do (x, y: Project) -> int:
     cmp(y.updated, x.updated)
 
   for p in projectPaths:
-    let name = splitPath(p.location)[1].replace(".","_")
+    let name = splitPath(p.location)[1].replace(".", "_")
     result[name] = p
 
   if len(result) != len(projectPaths):
