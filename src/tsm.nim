@@ -9,7 +9,7 @@ type
     open: bool # not used yet
 
 
-proc pickProject(projects: OrderedTable[string, Project]): string =
+proc fzf(projects: OrderedTable[string, Project]): string =
   ## use fzf as a selector for the project
   let (inputFile, inPath) = createTempFile("tsm", "")
   let (outFile, outPath) = createTempFile("tsm", "")
@@ -42,7 +42,7 @@ proc findProjects(): OrderedTable[string, Project] =
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
       projectPaths.add Project(location:d.path, updated: getLastModificationTime(d.path), open: false)
-  
+
   projectPaths.sort do (x,y: Project) -> int:
     cmp(y.updated, x.updated)
 
@@ -66,7 +66,7 @@ when isMainModule:
   checkFzf()
 
   let projects = findProjects()
-  let selected = pickProject(projects)
+  let selected = fzf(projects)
 
   if existsEnv("TMUX"):
     if selected notin listTmuxSessions():
