@@ -1,8 +1,8 @@
 # tsm todo's
 
-- [ ] add some flags with parseopt or cligen
-  - [ ] `-v|--version`
-  - [ ] `-o|--open`
+- [x]  add some flags with parseopt or cligen
+  - [x] `-v|--version`
+  - [x] `-o|--open`
 
 
 # Future

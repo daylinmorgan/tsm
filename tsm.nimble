@@ -9,4 +9,5 @@ bin           = @["tsm"]
 
 # Dependencies
 
-requires "nim >= 1.6.12"
+requires "nim >= 1.6.12",
+         "cligen"

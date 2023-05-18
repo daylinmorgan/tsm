@@ -1,7 +1,8 @@
 import std/[algorithm, os, osproc, sequtils, strformat, strutils, sugar, tables,
     tempfiles, times]
 
-const FZF_DEFAULT_ARGS = "--border-label='TSM: Tmux Session Manager' --ansi"
+const fzfDefaultArgs = "--border-label='TSM: Tmux Session Manager' --ansi"
+
 
 type
   Project = object
@@ -15,17 +16,21 @@ proc listTmuxSessions(): seq[string] =
 
 proc fzf(projects: OrderedTable[string, Project], header: string): string =
   ## use fzf as a selector for the project
-  let (inputFile, inPath) = createTempFile("tsm", "")
-  let (outFile, outPath) = createTempFile("tsm", "")
-  var FZF_ARGS = FZF_DEFAULT_ARGS
+
+  let 
+    (inputFile, inPath) = createTempFile("tsm", "")
+    (outFile, outPath) = createTempFile("tsm", "")
+
+  var fzfArgs = fzfDefaultArgs
 
   if header != "":
-    FZF_ARGS &= " --header-lines=1"
+    fzfArgs &= " --header-lines=1"
     inputFile.write header
 
   inputFile.write collect(for k in projects.keys(): k).join("\n")
   close inputFile
-  let errCode = execCmd(&"fzf {FZF_ARGS} < {inPath} > {outPath}")
+
+  let errCode = execCmd(&"fzf {fzfArgs} < {inPath} > {outPath}")
   close outFile
 
   if errCode != 0: echo &"fzf exited with code: {errCode}"
@@ -45,10 +50,13 @@ proc newProject(path: string, sessions: seq[string]): Project =
   result.updated = getLastModificationTime(path)
   result.open = splitPath(path)[1].replace(".", "_") in sessions
 
-proc findProjects(): tuple[header: string, projects: OrderedTable[string, Project]] =
+proc findProjects(open: bool): tuple[header: string, projects: OrderedTable[string, Project]] =
   ## get a table of possible project paths
-  let tsmDirs = getEnv("TSM_DIRS")
-  let sessions = listTmuxSessions()
+
+  let 
+    tsmDirs = getEnv("TSM_DIRS")
+    sessions = listTmuxSessions()
+
   if tsmDirs == "":
     echo "Please set $TSM_DIRS to a colon-delimited list of paths"
     quit 1
@@ -56,7 +64,16 @@ proc findProjects(): tuple[header: string, projects: OrderedTable[string, Projec
   var projects: seq[Project]
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
-      projects.add newProject(d.path, sessions)
+      let p = newProject(d.path, sessions)
+
+      if open:
+        if p.open: projects.add p
+      else: 
+        projects.add p
+
+  if len(projects) == 0:
+    echo "nothing to select"
+    quit 1
 
   projects.sort do (x, y: Project) -> int:
     result = cmp(y.open, x.open)
@@ -78,10 +95,10 @@ proc checkFzf() =
     echo "tsm requires fzf"
     quit 1
 
-when isMainModule:
+proc tsm(open:bool = false) =
   checkFzf()
 
-  let (header, projects) = findProjects()
+  let (header, projects) = findProjects(open)
   let selected = fzf(projects, header)
 
   if existsEnv("TMUX"):
@@ -93,3 +110,15 @@ when isMainModule:
       discard execCmd(&"tmux new-session -s {selected} -c {projects[selected].location}")
     else:
       discard execCmd(&"tmux attach -t {selected}")
+
+when isMainModule:
+  import cligen
+  const vsn = staticExec "git describe --tags --always --dirty=-dev"
+  clCfg.version = vsn
+
+  dispatch(
+    tsm, 
+    short={"version":'v'},
+    help={"open":"only show open sessions"}
+    )
+
