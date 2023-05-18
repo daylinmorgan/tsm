@@ -1,7 +1,9 @@
 # tsm todo's
 
-- [x] order input based on age (from fileInfo?)
-- [x] annotate in fzf options that are already open and place them first <--- also add color
+- [ ] add some flags with parseopt or cligen
+  - [ ] `-v|--version`
+  - [ ] `-o|--open`
+
 
 # Future
 
