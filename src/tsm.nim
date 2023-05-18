@@ -1,7 +1,7 @@
-import std/[algorithm, os, osproc, strformat, strutils, sugar, tables,
+import std/[algorithm, os, osproc, sequtils, strformat, strutils, sugar, tables,
     tempfiles, times]
 
-const FZF_ARGS = "--border-label='TSM: Tmux Session Manager'"
+const FZF_DEFAULT_ARGS = "--border-label='TSM: Tmux Session Manager' --ansi"
 
 type
   Project = object
@@ -9,15 +9,22 @@ type
     updated: Time
     open: bool # not used yet
 
+proc listTmuxSessions(): seq[string] =
+  let (output, _) = execCmdEx("tmux list-sessions -F '#S'")
+  return output.splitLines()
 
-proc fzf(projects: OrderedTable[string, Project]): string =
+proc fzf(projects: OrderedTable[string, Project], header: string): string =
   ## use fzf as a selector for the project
   let (inputFile, inPath) = createTempFile("tsm", "")
   let (outFile, outPath) = createTempFile("tsm", "")
+  var FZF_ARGS = FZF_DEFAULT_ARGS
+
+  if header != "":
+    FZF_ARGS &= " --header-lines=1"
+    inputFile.write header
 
   inputFile.write collect(for k in projects.keys(): k).join("\n")
   close inputFile
-
   let errCode = execCmd(&"fzf {FZF_ARGS} < {inPath} > {outPath}")
   close outFile
 
@@ -31,34 +38,40 @@ proc fzf(projects: OrderedTable[string, Project]): string =
   removeFile(inPath)
   removeFile(outPath)
 
-proc findProjects(): OrderedTable[string, Project] =
+proc name(p: Project): string = splitPath(p.location)[1].replace(".", "_")
+
+proc newProject(path: string, sessions: seq[string]): Project =
+  result.location = path
+  result.updated = getLastModificationTime(path)
+  result.open = splitPath(path)[1].replace(".", "_") in sessions
+
+proc findProjects(): tuple[header: string, projects: OrderedTable[string, Project]] =
   ## get a table of possible project paths
   let tsmDirs = getEnv("TSM_DIRS")
-
+  let sessions = listTmuxSessions()
   if tsmDirs == "":
     echo "Please set $TSM_DIRS to a colon-delimited list of paths"
     quit 1
 
-  var projectPaths: seq[Project]
+  var projects: seq[Project]
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
-      projectPaths.add Project(location: d.path,
-                               updated: getLastModificationTime(d.path),
-                               open: false)
+      projects.add newProject(d.path, sessions)
 
-  projectPaths.sort do (x, y: Project) -> int:
-    cmp(y.updated, x.updated)
+  projects.sort do (x, y: Project) -> int:
+    result = cmp(y.open, x.open)
+    if result == 0:
+      result = cmp(y.updated, x.updated)
 
-  for p in projectPaths:
-    let name = splitPath(p.location)[1].replace(".", "_")
-    result[name] = p
+  for p in projects:
+    if p.open: result.projects[&"\e[93m{p.name}\e[0m"] = p
+    else: result.projects[p.name] = p
 
-  if len(result) != len(projectPaths):
+  if len(result.projects) != len(projects):
     echo "there may be nonunique entries in the project names"
 
-proc listTmuxSessions(): seq[string] =
-  let (output, _) = execCmdEx("tmux list-sessions -F '#S'")
-  return output.splitLines()
+  if projects.filterIt(it.open).len > 0:
+    result.header = "\e[93m[open session]\e[0m\n"
 
 proc checkFzf() =
   if findExe("fzf") == "":
@@ -68,8 +81,8 @@ proc checkFzf() =
 when isMainModule:
   checkFzf()
 
-  let projects = findProjects()
-  let selected = fzf(projects)
+  let (header, projects) = findProjects()
+  let selected = fzf(projects, header)
 
   if existsEnv("TMUX"):
     if selected notin listTmuxSessions():
