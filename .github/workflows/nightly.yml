@@ -19,7 +19,10 @@ jobs:
 
       - name: print latest commit
         run: echo ${{ github.sha }}
-
+    
+      - run: |
+          git rev-list --since="24 hours" HEAD
+        
       - id: should_run
         continue-on-error: true
         name: check latest commit is less than a day
