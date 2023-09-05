@@ -14,8 +14,6 @@ requires "nim >= 2.0.0",
          "illwill",
          "cligen"
 
-taskRequires "release", "https://github.com/daylinmorgan/ccnz"
-
 import strformat
 const targets = [
     "x86_64-linux-gnu",

@@ -16,6 +16,7 @@ jobs:
 
       # for cross compilation with ccnz
       - uses: goto-bus-stop/setup-zig@v2
+      - run: nimble install -Y https://github.com/daylinmorgan/ccnz
 
       - name: Generate build artifacts
         run: nimble release
