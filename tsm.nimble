@@ -19,8 +19,10 @@ taskRequires "release", "https://github.com/daylinmorgan/ccnz"
 import strformat
 const targets = [
     "x86_64-linux-gnu",
+    "aarch64-linux-gnu",
     "x86_64-linux-musl",
     "x86_64-macos-none",
+    "aarch64-macos-none",
     # "x86_64-windows-gnu" # no tsm on windows
   ]
 
