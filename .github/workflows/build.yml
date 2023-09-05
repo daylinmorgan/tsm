@@ -12,8 +12,7 @@ jobs:
 
       - uses: jiro4989/setup-nim-action@v1
         with:
-          nim-version: ${{ env.NIM_VERSION }}
-
+          nim-version: 2.0.0
 
       # for cross compilation with ccnz
       - uses: goto-bus-stop/setup-zig@v2
