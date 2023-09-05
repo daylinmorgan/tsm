@@ -7,6 +7,9 @@ proc checkExe(names: varargs[string]) =
     if findExe(name) == "":
       echo "tsm requires " & name
 
+template tmux(cmd: string) =
+  discard execCmd("tmux " & cmd)
+
 proc tsm() =
   checkExe "tmux"
 
@@ -14,16 +17,16 @@ proc tsm() =
     project = selectProject()
     selected = project.name
 
-  # TODO: refactor
   if existsEnv("TMUX"):
     if selected notin listTmuxSessions():
-      discard execCmd(&"tmux new-session -d -s {selected} -c {project.location}")
-    discard execCmd(&"tmux switch-client -t {selected}")
+      tmux &"new-session -d -s {selected} -c {project.location}"
+    else:
+      tmux &"switch-client -t {selected}"
   else:
     if selected notin listTmuxSessions():
-      discard execCmd(&"tmux new-session -s {selected} -c {project.location}")
+      tmux &"new-session -s {selected} -c {project.location}"
     else:
-      discard execCmd(&"tmux attach -t {selected}")
+      tmux &"attach -t {selected}"
 
 when isMainModule:
   import cligen
