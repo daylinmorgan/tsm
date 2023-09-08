@@ -6,7 +6,6 @@ on:
 jobs:
   build-artifact:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -16,10 +15,11 @@ jobs:
 
       # for cross compilation with ccnz
       - uses: goto-bus-stop/setup-zig@v2
-      - run: nimble install -Y https://github.com/daylinmorgan/ccnz
 
       - name: Generate build artifacts
-        run: nimble release
+        run: |
+          nimble install -Y forge
+          nimble release
 
       - name: Create artifact bundles
         run: nimble bundle

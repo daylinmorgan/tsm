@@ -15,37 +15,19 @@ requires "nim >= 2.0.0",
          "cligen"
 
 import strformat
-const targets = [
-    "x86_64-linux-gnu",
-    "aarch64-linux-gnu",
-    "x86_64-linux-musl",
-    "x86_64-macos-none",
-    "aarch64-macos-none",
-    # "x86_64-windows-gnu" # no tsm on windows
-  ]
 
 task release, "build release assets":
-  mkdir "dist"
-  for target in targets:
-    let
-      ext = if target == "x86_64-windows-gnu": ".cmd" else: ""
-      outdir = &"dist/{target}/"
-      app = projectName()
-    exec &"ccnz cc --target {target} --nimble -- --out:{outdir}{app}{ext} -d:release src/{app}"
+  version = (gorgeEx "git describe --tags --always --match 'v*'").output
+  exec &"forge release -v {version} -V"
 
 task bundle, "package build assets":
-  cd "dist"
-  for target in targets:
-    let
-      app = projectName()
-      cmd =
-        if target == "x86_64-windows-gnu":
-          &"7z a {app}-v{version}-{target}.zip {target}"
-        else:
-          &"tar czf {app}-v{version}-{target}.tar.gz {target}"
-
-    cpFile("../README.md", &"{target}/README.md")
-    exec cmd
-
+  withDir "dist":
+    for dir in listDirs("."):
+      let cmd = if "windows" in dir:
+        &"7z a {dir}.zip {dir}"
+      else: 
+        &"tar czf {dir}.tar.gz {dir}"
+      cpFile("../README.md", &"{dir}/README.md")
+      exec cmd
 
 
