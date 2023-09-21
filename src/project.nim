@@ -1,10 +1,6 @@
-import std/[algorithm, os, osproc, strutils, tables, times]
+import std/[algorithm, os, strutils, tables, times]
 
-
-proc listTmuxSessions*(): seq[string] =
-  let (output, _) = execCmdEx("tmux list-sessions -F '#S'")
-  return output.splitLines()
-
+import utils
 
 type
   Project* = object
@@ -20,14 +16,12 @@ proc newProject(path: string, sessions: seq[string]): Project =
 
 proc name*(p: Project): string = splitPath(p.location)[1].replace(".", "_")
 
-
 proc findProjects*(open: bool = false): tuple[header: string,
     projects: OrderedTable[string, Project]] =
   ## get a table of possible project paths
 
   let
     tsmDirs = getEnv("TSM_DIRS")
-    sessions = listTmuxSessions()
 
   if tsmDirs == "":
     echo "Please set $TSM_DIRS to a colon-delimited list of paths"
@@ -36,7 +30,7 @@ proc findProjects*(open: bool = false): tuple[header: string,
   var projects: seq[Project]
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
-      let p = newProject(d.path, sessions)
+      let p = newProject(d.path, tmux.sessions)
       if open and p.open: projects.add p
       else:
         projects.add p
@@ -58,5 +52,4 @@ proc findProjects*(open: bool = false): tuple[header: string,
 
   if len(result.projects) != len(projects):
     echo "there may be nonunique entries in the project names"
-
 

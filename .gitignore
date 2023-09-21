@@ -1,3 +1,5 @@
 /src/tui
 /dist
 /bin
+# atlas
+src/nim.cfg 

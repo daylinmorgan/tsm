@@ -12,9 +12,9 @@ proc exitProc() {.noconv.} =
   illwillDeinit()
   showCursor()
 
-template withfgColor(ForegroundColor, body: untyped) =
+template withfgColor(fgColor, body: untyped) =
   var tb = state.buffer
-  tb.setForegroundColor(ForegroundColor, bright = true)
+  tb.setForegroundColor(fgColor, bright = true)
   body
   tb.setForegroundColor(fgWhite, bright = true)
 
@@ -100,8 +100,9 @@ proc getProject(): Project =
 
 proc clip(s: string): string =
   let maxWidth = state.window.width - 2
-  result = if s.len > maxWidth:
-    s[0..^state.window.width]
+  result =
+    if s.len > maxWidth:
+      s[0..^state.window.width]
     else: s
 
 proc displayProject(tb: var TerminalBuffer, x, y: int, project: Project) =
@@ -155,7 +156,6 @@ when defined(debug):
     for i, line in lines:
       tb.write(x, y+i, line)
 
-
 proc draw() =
   var
     tb = state.buffer
@@ -164,7 +164,7 @@ proc draw() =
   tb.setForegroundColor(fgWhite, bright = true)
 
   let
-    (x1, x2, y1, _) = state.window.coord.values()
+    (x1, x2, y1, y2) = state.window.coord.values()
     maxWidth = x2 - x1 - 4
 
   when defined(debug):

@@ -1,36 +1,20 @@
-import std/[os, osproc, strformat, tables]
+import std/[tables]
 
-import tui, project
-
-proc checkExe(names: varargs[string]) =
-  for name in names:
-    if findExe(name) == "":
-      echo "tsm requires " & name
-
-template tmux(cmd: string) =
-  discard execCmd("tmux " & cmd)
+import tui, project, utils
 
 proc tsm() =
-  checkExe "tmux"
-
   let
     project = selectProject()
     selected = project.name
 
-  if existsEnv("TMUX"):
-    if selected notin listTmuxSessions():
-      tmux &"new-session -d -s {selected} -c {project.location}"
-    else:
-      tmux &"switch-client -t {selected}"
+  if selected notin tmux.sessions:
+    tmux.new project.name, project.location
   else:
-    if selected notin listTmuxSessions():
-      tmux &"new-session -s {selected} -c {project.location}"
-    else:
-      tmux &"attach -t {selected}"
+    tmux.attach project.name
 
 when isMainModule:
   import cligen
-  const vsn = staticExec "git describe --tags --always HEAD"
+  const vsn = staticExec "git describe --tags --always HEAD --match 'v*'"
   clCfg.version = vsn
 
   if clCfg.helpAttr.len == 0:
