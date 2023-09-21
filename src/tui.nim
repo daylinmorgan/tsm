@@ -1,4 +1,4 @@
-import std/[enumerate, os, sequtils, strformat, strutils, tables]
+import std/[enumerate, os, sequtils, strformat, strutils]
 
 import illwill
 import project
@@ -36,10 +36,13 @@ type
     window: Window
     cursor: Cursor
     projectIdx: Natural
+    projects: seq[Project]
+
 
 # TODO: don't need top level projects
-let (_, projects) = findProjects()
+# let (_, projects) = findProjects()
 var state = State()
+state.projects = findProjects()
 
 proc values(c: Coord): (int, int, int, int) = (c.x1, c.x2, c.y1, c.y2)
 
@@ -51,7 +54,7 @@ proc scrollUp() =
     dec state.projectIdx
 
 proc scrollDown() =
-  if (projects.len - state.projectIdx) > state.window.height + 1:
+  if (state.projects.len - state.projectIdx) > state.window.height + 1:
     inc state.projectIdx
 
 proc up() =
@@ -83,14 +86,14 @@ proc sortProjects(): seq[Project] =
     rest: seq[Project]
 
   if state.input != "":
-    for name, project in projects:
+    for project in state.projects:
       if project.name.startsWith(state.input):
         priority &= project.match()
       else:
         rest &= project
     return priority & rest
   else:
-    return projects.values().toSeq()
+    return state.projects.toSeq()
 
 proc getProject(): Project =
   let projects = sortProjects()
@@ -192,17 +195,12 @@ proc update(c: var Cursor, min, max: Natural) =
 proc getCoords(): Coord =
   var width, height: Natural
   let (termWidth, termHeight) = terminalSize()
-
-
   width = if termWidth > 65: 65 else: termWidth
   height = if termHeight > 20: 20 else: termHeight
-
 
   # fullscreen type behavior
   result.x1 = ((termWidth - width)/2).int
   result.y1 = ((termHeight - height)/2).int
-
-
   result.x2 = result.x1 + width
   result.y2 = result.y1 + height
 

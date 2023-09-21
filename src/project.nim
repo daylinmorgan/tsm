@@ -1,4 +1,4 @@
-import std/[algorithm, os, strutils, tables, times]
+import std/[algorithm, os, strutils, times]
 
 import utils
 
@@ -16,10 +16,9 @@ proc newProject(path: string, sessions: seq[string]): Project =
 
 proc name*(p: Project): string = splitPath(p.location)[1].replace(".", "_")
 
-proc findProjects*(open: bool = false): tuple[header: string,
-    projects: OrderedTable[string, Project]] =
+proc findProjects*(open: bool = false): seq[Project] =
   ## get a table of possible project paths
-
+  # TODO: improve this to handle duplicate entries by appending parent?
   let
     tsmDirs = getEnv("TSM_DIRS")
 
@@ -27,29 +26,29 @@ proc findProjects*(open: bool = false): tuple[header: string,
     echo "Please set $TSM_DIRS to a colon-delimited list of paths"
     quit 1
 
-  var projects: seq[Project]
+  # TODO: only return directories
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
       let p = newProject(d.path, tmux.sessions)
-      if open and p.open: projects.add p
+      if open and p.open: result.add p
       else:
-        projects.add p
+        result.add p
 
-  if len(projects) == 0:
+  if len(result) == 0:
     echo "nothing to select"
     quit 1
 
   # TODO: use the input as a first filter?
 
   # favor open projects then by update time
-  projects.sort do (x, y: Project) -> int:
+  result.sort do (x, y: Project) -> int:
     result = cmp(y.open, x.open)
     if result == 0:
       result = cmp(y.updated, x.updated)
 
-  for p in projects:
-    result.projects[p.name] = p
+  # for p in projects:
+  #   result.projects[p.name] = p
 
-  if len(result.projects) != len(projects):
-    echo "there may be nonunique entries in the project names"
+  # if len(result.projects) != len(projects):
+  #   echo "there may be nonunique entries in the project names"
 
