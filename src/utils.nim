@@ -25,13 +25,15 @@ template cmd(tmux: Tmux, args: string) =
 
 proc newTmux(): Tmux =
   result.active = existsEnv("TMUX")
-  result.sessions = (
-    result.cmdGet "list-sessions -F '#S'"
-  ).strip().split("\n")
+  # check if server is active?
+  if execCmd("tmux run") == 0:
+    result.sessions = (
+      result.cmdGet "list-sessions -F '#S'"
+    ).strip().split("\n")
 
 proc attach*(t: Tmux, session: string) =
   let args =
-    if t.active:"switch-client -t"
+    if t.active: "switch-client -t"
     else: "attach -t"
   t.cmd fmt"{args} {session}"
 
