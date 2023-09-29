@@ -12,7 +12,8 @@ binDir        = "bin"
 
 requires "nim >= 2.0.0",
          "illwill",
-         "cligen"
+         "cligen",
+         "bbansi"
 
 import strformat
 

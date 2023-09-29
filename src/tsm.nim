@@ -1,6 +1,6 @@
 import std/[tables]
 
-import tui, project, utils
+import selector, project, utils
 
 proc tsm(open: bool = false) =
   let
