@@ -2,9 +2,9 @@ import std/[tables]
 
 import tui, project, utils
 
-proc tsm() =
+proc tsm(open: bool = false) =
   let
-    project = selectProject()
+    project = selectProject(open)
     selected = project.name
 
   if selected notin tmux.sessions:

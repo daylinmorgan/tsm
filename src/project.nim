@@ -30,7 +30,8 @@ proc findProjects*(open: bool = false): seq[Project] =
   for devDir in tsmDirs.split(":"):
     for d in walkDir(devDir):
       let p = newProject(d.path, tmux.sessions)
-      if open and p.open: result.add p
+      if open:
+        if p.open: result.add p
       else:
         result.add p
 

@@ -42,7 +42,6 @@ type
 # TODO: don't need top level projects
 # let (_, projects) = findProjects()
 var state = State()
-state.projects = findProjects()
 
 proc values(c: Coord): (int, int, int, int) = (c.x1, c.x2, c.y1, c.y2)
 
@@ -219,8 +218,9 @@ proc newWindow(): Window =
   state.cursor.update(min = result.coord.y1+3, max = result.coord.y2-1)
   result.tooSmall = (result.width < 15 or result.height < 10)
 
-proc selectProject*(): Project =
+proc selectProject*(open: bool = false): Project =
 
+  state.projects = findProjects(open)
   illwillInit(fullscreen = true)
   setControlCHook(quitProc)
   hideCursor()
