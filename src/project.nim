@@ -28,8 +28,9 @@ proc findProjects*(open: bool = false): seq[Project] =
 
   # TODO: only return directories
   for devDir in tsmDirs.split(":"):
-    for d in walkDir(devDir):
-      let p = newProject(d.path, tmux.sessions)
+    for path in walkDir(devDir):
+      if path.kind == pcFile or path.kind == pcLinkToFile: continue
+      let p = newProject(path.path, tmux.sessions)
       if open:
         if p.open: result.add p
       else:
