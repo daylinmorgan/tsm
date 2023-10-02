@@ -26,12 +26,11 @@ export TSM_DIRS="$HOME/projects/personal:$HOME/projects/work"
 ```
 
 To make full use of `tsm` you should also add a new key binding to your `tmux.conf`.
-For example you can bind the s key to show a popup with `tsm`:
+For example you can bind the f key to show a popup with `tsm`:
 
 ```sh
-bind s display-popup \
+bind f display-popup \
   -h 60% -w 60% \
-  -B -e FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --height=100%" \
   -E "tsm"
 ```
 
