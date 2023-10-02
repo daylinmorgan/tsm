@@ -115,20 +115,24 @@ proc clip(s: string): string =
       s[0..^maxWidth]
     else: s
 
+proc highlight(p: Project): string =
+  if p.location == "": "green"
+  elif p.open: "yellow"
+  else: "default"
+
 proc addProject(b: var Buffer, project: Project, selected: bool) =
   let
     name = project.name.clip
     input = state.input.clip
-    projectColor = if project.open: "yellow" else: "default"
     cur = (if selected: "> " else: "  ")
 
   if project.matched:
     var displayName = $input.bb("red")
     if input.len < name.len:
-      displayName.add $name[input.len..^1].bb(projectColor)
+      displayName.add $name[input.len..^1].bb(project.highlight)
     b.addLine(cur & $displayName)
   else:
-    b.addLine(cur & $name.bb(projectColor))
+    b.addLine(cur & $name.bb(project.highlight))
 
 proc addProjectCount(b: var Buffer) =
   let
