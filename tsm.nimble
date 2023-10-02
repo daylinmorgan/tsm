@@ -13,7 +13,7 @@ binDir        = "bin"
 requires "nim >= 2.0.0",
          "illwill",
          "cligen",
-         "bbansi"
+         "https://github.com/daylinmorgan/bbansi#main"
 
 import strformat
 
