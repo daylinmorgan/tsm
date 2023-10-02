@@ -1,46 +1,58 @@
-import std/[algorithm, os, strutils, times]
+import std/[algorithm, os, sequtils, sets, strutils, tables, times]
 
+import bbansi
 import utils
 
 type
   Project* = object
+    name*: string
     location*: string
     updated*: Time
     open*: bool
     matched*: bool
 
-proc newProject(path: string, sessions: seq[string]): Project =
-  result.location = path
-  result.updated = getLastModificationTime(path)
-  result.open = splitPath(path)[1].replace(".", "_") in sessions
+proc pathToName(path: string): string = splitPath(path)[1].replace(".", "_")
 
-proc name*(p: Project): string = splitPath(p.location)[1].replace(".", "_")
+proc newProject(path: string, open: bool): Project =
+  result.location = path
+  result.name = path.pathToName()
+  result.updated = getLastModificationTime(path)
+  result.open = open
+
+proc newUnknownProject(name: string): Project =
+  result.name = name
+
+proc getTsmDirs(): seq[string] =
+  let tsmDirs = getEnv("TSM_DIRS")
+  if tsmDirs == "":
+    bbEcho "[red]Please set [cyan]$TSM_DIRS[/] to a colon-delimited list of paths"
+    quit QuitFailure
+  result = tsmDirs.split(":")
 
 proc findProjects*(open: bool = false): seq[Project] =
-  ## get a table of possible project paths
-  # TODO: improve this to handle duplicate entries by appending parent?
-  let
-    tsmDirs = getEnv("TSM_DIRS")
+  var candidates: Table[string, seq[string]]
+  var sessions = tmux.sessions.toHashSet()
 
-  if tsmDirs == "":
-    echo "Please set $TSM_DIRS to a colon-delimited list of paths"
-    quit 1
-
-  # TODO: only return directories
-  for devDir in tsmDirs.split(":"):
+  for devDir in getTsmDirs():
     for path in walkDir(devDir):
-      if path.kind == pcFile or path.kind == pcLinkToFile: continue
-      let p = newProject(path.path, tmux.sessions)
-      if open:
-        if p.open: result.add p
+      if ({path.kind} * {pcFile, pcLinkToFile}).len > 0: continue
+      let name = path.path.tailDir()
+      if name in candidates:
+        candidates[name].add path.path
       else:
-        result.add p
+        candidates[name] = @[path.path]
 
-  if len(result) == 0:
-    echo "nothing to select"
-    quit 1
+  # TODO: improve this to handle duplicate entries by appending parent?
+  for name, paths in candidates:
+    if len(paths) == 1:
+      let path = paths[0]
+      let open = path.pathToName in sessions
+      result.add newProject(path, open)
+      if open:
+        sessions.excl toHashSet([path.pathToName])
 
-  # TODO: use the input as a first filter?
+  if open:
+    result = result.filterIt(it.open)
 
   # favor open projects then by update time
   result.sort do (x, y: Project) -> int:
@@ -48,9 +60,11 @@ proc findProjects*(open: bool = false): seq[Project] =
     if result == 0:
       result = cmp(y.updated, x.updated)
 
-  # for p in projects:
-  #   result.projects[p.name] = p
+  if sessions.len > 0:
+    result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
 
-  # if len(result.projects) != len(projects):
-  #   echo "there may be nonunique entries in the project names"
+  if len(result) == 0:
+    echo "nothing to select"
+    quit 1
+
 
