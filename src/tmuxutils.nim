@@ -1,5 +1,7 @@
 import std/[os, osproc, strformat, strutils]
 
+import term
+
 type
   Tmux = object
     active: bool
@@ -8,24 +10,31 @@ type
 proc checkExe(names: varargs[string]) =
   for name in names:
     if findExe(name) == "":
-      echo "tsm requires " & name
+      termError "tsm requires " & name
 
 checkExe "tmux"
 
+proc tmuxError(args: string, output: string = "") =
+  termError "failed to run: [bold]tmux", args
+  if output != "":
+    termError "see below for error"
+    echo output
+  quit QuitFailure
+
+
 proc cmdGet(tmux: Tmux, args: string): string =
   let (output, code) = execCmdEx("tmux " & args)
-  if code != 0:
-    echo "ERROR: failed to run: tmux ", args, "see below for error"
-    echo output
-    quit QuitFailure
-  return output
+  if code == 0: return output
+  tmuxError args, output
 
 template cmd(tmux: Tmux, args: string) =
-  discard execCmd("tmux " & args)
+  let code = execCmd "tmux " & args
+  if code != 0: tmuxError(args)
+  # discard tmux.cmdGet args
 
 proc newTmux(): Tmux =
   result.active = existsEnv("TMUX")
-  # check if server is active?
+  # check if server is active
   if execCmdEx("tmux run").exitCode == 0:
     result.sessions = (
       result.cmdGet "list-sessions -F '#S'"
@@ -43,6 +52,5 @@ proc new*(t: Tmux, session: string, loc: string) =
     t.attach session
   else:
     t.cmd fmt"new-session -s {session} -c {loc}"
-
 
 let tmux* = newTmux()
