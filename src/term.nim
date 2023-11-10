@@ -1,6 +1,6 @@
 import std/strutils
 import bbansi
-
+export bbansi
 const
   sep = " [magenta]|[/] "
   prefix = "[cyan]tsm[/]" & sep

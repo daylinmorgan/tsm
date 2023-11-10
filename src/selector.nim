@@ -1,11 +1,23 @@
 import std/[enumerate, os, strformat, strutils, terminal]
 
 from illwill import illwillDeinit, illwillInit, getKey, Key
-import bbansi
+import term
 
 import project
 
 func toStr(k: Key): string = $chr(ord(k))
+
+proc getMaxHeight(): int =
+  result = 10
+  let setting = getEnv("TSM_HEIGHT")
+  if setting != "":
+    try:
+      result = parseInt(setting)
+    except ValueError:
+      termQuit fmt"failed to parse TSM_HEIGHT of `{setting}`, expected integer" 
+
+
+let maxHeight = getMaxHeight()
 
 type
   Cursor = object
@@ -165,7 +177,7 @@ proc draw() =
 
 proc update(s: var State) =
   s.buffer.width = terminalWidth()
-  s.buffer.height = min(terminalHeight(), 10 + state.buffer.inputPad)
+  s.buffer.height = min(terminalHeight(), maxHeight + state.buffer.inputPad)
   s.cursor.max = s.buffer.height - state.buffer.inputPad
 
 proc clear(b: var Buffer) =
