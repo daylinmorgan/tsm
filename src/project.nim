@@ -1,8 +1,9 @@
 import std/[algorithm, os, sequtils, sets, strutils, sugar, tables, times]
-import tmuxutils, term
+import tmuxutils, term, config
 
 type
   Project* = object
+    named*: bool
     name*: string
     location*: string
     updated*: Time
@@ -11,13 +12,15 @@ type
 
 proc pathToName(path: string): string = splitPath(path)[1].replace(".", "_")
 
-proc newProject(path: string, open: bool, name = ""): Project =
+proc newProject(path: string, open: bool, name = "",
+    named: bool = false): Project =
   result.location = path
   result.name =
     if name != "": name
    else: path.pathToName()
   result.updated = getLastModificationTime(path)
   result.open = open
+  result.named = named
 
 proc newUnknownProject(name: string): Project =
   result.name = name
@@ -29,8 +32,9 @@ proc getTsmDirs(): seq[string] =
     termQuit "Please set [yellow]$TSM_DIRS[/] to a colon-delimited list of paths"
   result = tsmDirs.split(":")
 
-proc findDuplicateProjects(paths: seq[string],
-    sessions: var HashSet[string]): seq[Project] =
+proc findDuplicateProjects(
+  paths: seq[string], sessions: var HashSet[string]
+): seq[Project] =
   var candidates: Table[string, seq[string]]
   for p in paths:
     candidates[p] = p.split(DirSep)
@@ -51,10 +55,11 @@ proc findDuplicateProjects(paths: seq[string],
     termQuit "failed to deduplicate these paths:" & paths.join(", ")
 
 proc findProjects*(open: bool = false): seq[Project] =
+  let tsmConfig = loadTsmConfig()
   var candidates: Table[string, seq[string]]
   var sessions = tmux.sessions.toHashSet()
 
-  for devDir in getTsmDirs():
+  for devDir in tsmConfig.dirs:
     for path in walkDir(devDir):
       if ({path.kind} * {pcFile, pcLinkToFile}).len > 0: continue
       let name = path.path.splitPath.tail
@@ -71,6 +76,11 @@ proc findProjects*(open: bool = false): seq[Project] =
     else:
       result &= findDuplicateProjects(paths, sessions)
 
+  for session in tsmConfig.sessions:
+    if session.name notin sessions:
+      result.add newProject(path = session.dir, open = false,
+          name = session.name, named = true)
+
   if open:
     result = result.filterIt(it.open)
 
@@ -79,6 +89,7 @@ proc findProjects*(open: bool = false): seq[Project] =
     result = cmp(y.open, x.open)
     if result == 0:
       result = cmp(y.updated, x.updated)
+
 
   if sessions.len > 0:
     result = sessions.toSeq().mapIt(newUnknownProject(it)) & result

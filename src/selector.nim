@@ -14,7 +14,7 @@ proc getMaxHeight(): int =
     try:
       result = parseInt(setting)
     except ValueError:
-      termQuit fmt"failed to parse TSM_HEIGHT of `{setting}`, expected integer" 
+      termQuit fmt"failed to parse TSM_HEIGHT of `{setting}`, expected integer"
 
 
 let maxHeight = getMaxHeight()
@@ -128,7 +128,8 @@ proc clip(s: string): string =
     else: s
 
 proc highlight(p: Project): string =
-  if p.location == "": "green"
+  if p.named: "red"
+  elif p.location == "": "green"
   elif p.open: "yellow"
   else: "default"
 

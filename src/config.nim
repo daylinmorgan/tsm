@@ -3,12 +3,12 @@ import std/[os, parsecfg, sequtils, tables, strutils]
 import term
 
 type
-  TsmConfig = object
-    dirs: seq[string]
-    sessions: seq[Session]
+  TsmConfig* = object
+    dirs*: seq[string]
+    sessions*: seq[Session]
 
   Session = object
-    name, dir: string
+    name*, dir*: string
 
 proc loadConfigFile(): TsmConfig =
   let configPath = getHomeDir() / ".config/tsm/config.ini"
@@ -23,7 +23,7 @@ proc loadConfigFile(): TsmConfig =
           termError "[dirs] table should only contain a list of paths"
         result.dirs.add key
 
-proc loadTsmConfig(): TsmConfig =
+proc loadTsmConfig*(): TsmConfig =
   result = loadConfigFile()
   let tsmDirs = getEnv("TSM_DIRS")
   if tsmDirs != "":
