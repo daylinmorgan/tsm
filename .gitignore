@@ -1,6 +1,12 @@
 /src/tui
 /dist
 /bin
+
 # atlas
-src/nim.cfg 
+src/nim.cfg
 *.workspace
+
+# nimble
+nimbledeps
+nimble.develop
+nimble.paths

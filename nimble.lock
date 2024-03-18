@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "packages": {
+    "bbansi": {
+      "version": "0.1.0",
+      "vcsRevision": "a7eb31407d50bb773bebc8b590ae25fa5af1bbec",
+      "url": "https://github.com/daylinmorgan/bbansi",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "1a4ea3d954edf4d76202237e4848ed56e468a0f2"
+      }
+    },
+    "cligen": {
+      "version": "1.7.0",
+      "vcsRevision": "4193f802796f15559c81c6dd56724d6f20345917",
+      "url": "https://github.com/c-blake/cligen.git",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "300bd7fdb6e48d2d98e34ed0661206b50331e99c"
+      }
+    },
+    "illwill": {
+      "version": "0.3.3",
+      "vcsRevision": "6ba6045038a01d1855208c4a9be7d4826d774001",
+      "url": "https://github.com/inv2004/illwill/",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "c1971885588771d9c413d5b6ade93237e8f1635a"
+      }
+    }
+  },
+  "tasks": {}
+}

@@ -10,8 +10,9 @@ binDir        = "bin"
 
 # Dependencies
 
-requires "nim >= 2.0.0",
-         "illwill",
-         "cligen",
-         "https://github.com/daylinmorgan/bbansi#main"
+requires "nim >= 2.0.0"
+requires "https://github.com/inv2004/illwill/#6ba6045038a01d1855208c4a9be7d4826d774001"
+# requires "illwill == 0.3.2",
+requires "cligen"
+requires "https://github.com/daylinmorgan/bbansi >= 0.1.0"
 
