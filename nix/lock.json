@@ -1,0 +1,40 @@
+{
+  "depends": [
+    {
+      "method": "fetchzip",
+      "path": "/nix/store/x91md8lmrxxdd4xizg0r9gcbl8sqn8vk-source",
+      "rev": "6ba6045038a01d1855208c4a9be7d4826d774001",
+      "sha256": "13hrcvpynlyr8hqx1h6qkfd32ihg255yd8wmk6l4q6bmiw8frw09",
+      "srcDir": "",
+      "url": "https://github.com/inv2004/illwill/archive/6ba6045038a01d1855208c4a9be7d4826d774001.tar.gz",
+      "subDir": "",
+      "packages": [
+        "illwill"
+      ]
+    },
+    {
+      "method": "fetchzip",
+      "path": "/nix/store/4h59kkd5db97j5m92szryjydxyr9bnwg-source",
+      "rev": "4193f802796f15559c81c6dd56724d6f20345917",
+      "sha256": "04w4hy5zbcmp173jx72b89jk9l7rnpqv9d3cgs8lwmfcagjac7zz",
+      "srcDir": "",
+      "url": "https://github.com/c-blake/cligen/archive/4193f802796f15559c81c6dd56724d6f20345917.tar.gz",
+      "subDir": "",
+      "packages": [
+        "cligen"
+      ]
+    },
+    {
+      "method": "fetchzip",
+      "path": "/nix/store/8ilhirvpc8qi3jbbh1fi3a8psr780cz4-source",
+      "rev": "a7eb31407d50bb773bebc8b590ae25fa5af1bbec",
+      "sha256": "06s4198pbqjga7nqrvajyxqxx3df83fk3qn21pv7axshl19kh9bq",
+      "srcDir": "src",
+      "url": "https://github.com/daylinmorgan/bbansi/archive/a7eb31407d50bb773bebc8b590ae25fa5af1bbec.tar.gz",
+      "subDir": "",
+      "packages": [
+        "bbansi"
+      ]
+    }
+  ]
+}

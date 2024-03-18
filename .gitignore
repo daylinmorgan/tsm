@@ -10,3 +10,5 @@ src/nim.cfg
 nimbledeps
 nimble.develop
 nimble.paths
+
+result
