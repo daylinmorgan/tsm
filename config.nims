@@ -14,6 +14,9 @@ task release, "build release assets":
   version = (gorgeEx "git describe --tags --always --match 'v*'").output
   exec &"forge release -v {version} -V"
 
+task updateNixLock, "regenerate nix/lock.json":
+  exec "nix run github:daylinmorgan/nnl nimble.lock > nix/lock.json"
+
 task bundle, "package build assets":
   withDir "dist":
     for dir in listDirs("."):

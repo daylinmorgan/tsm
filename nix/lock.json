@@ -38,11 +38,11 @@
     },
     {
       "method": "fetchzip",
-      "path": "/nix/store/m086yq0f29cg98w3b12d70cw7xki1j39-source",
-      "rev": "e77ad85cd3a68cabd6ef66727fa1a0cd14c4d0d3",
-      "sha256": "1l5a5kwviq76kxzagljzpwzc3p43qz7wzs5zvrqi5c59klw1967c",
+      "path": "/nix/store/ws9bc49njd13lzlankiw9vz85h56n0sn-source",
+      "rev": "9a85d9ed028f06f1ed1ee6851480a51408a6004e",
+      "sha256": "04r9wincqd4a5hmxixbsw0zjpvlrpckny4jkzahvbnh8s5f1xlc6",
       "srcDir": "src",
-      "url": "https://github.com/daylinmorgan/bbansi/archive/e77ad85cd3a68cabd6ef66727fa1a0cd14c4d0d3.tar.gz",
+      "url": "https://github.com/daylinmorgan/bbansi/archive/9a85d9ed028f06f1ed1ee6851480a51408a6004e.tar.gz",
       "subDir": "",
       "packages": [
         "bbansi"

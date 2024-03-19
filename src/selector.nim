@@ -128,9 +128,9 @@ proc clip(s: string): string =
     else: s
 
 proc highlight(p: Project): string =
-  if p.named: "red"
-  elif p.location == "": "green"
+  if p.location == "": "green"
   elif p.open: "yellow"
+  elif p.named: "bold cyan"
   else: "default"
 
 proc addProject(b: var Buffer, project: Project, selected: bool) =
@@ -140,10 +140,11 @@ proc addProject(b: var Buffer, project: Project, selected: bool) =
     cur = (if selected: "> " else: "  ")
 
   if project.matched:
-    var displayName = $input.bb("red")
+    var displayName = fmt"[red]{input}[/]"
     if input.len < name.len:
-      displayName.add $name[input.len..^1].bb(project.highlight)
-    b.addLine(cur & $displayName)
+      # bbansi missing add(string, bbstring) interface
+      displayName = displayName & fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
+    b.addLine(cur & $displayName.bb)
   else:
     b.addLine(cur & $name.bb(project.highlight))
 
