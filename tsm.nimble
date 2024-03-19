@@ -11,8 +11,10 @@ binDir        = "bin"
 # Dependencies
 
 requires "nim >= 2.0.0"
-requires "https://github.com/inv2004/illwill/#6ba6045038a01d1855208c4a9be7d4826d774001"
+# illwill PR 47
+requires "https://github.com/inv2004/illwill/#449ae5d2f05aba125d5a71823ff1da55b1766d70"
 # requires "illwill == 0.3.2",
 requires "cligen"
 requires "https://github.com/daylinmorgan/bbansi >= 0.1.0"
+requires "https://github.com/usu-dev/usu-nim"
 

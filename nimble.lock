@@ -1,16 +1,6 @@
 {
   "version": 2,
   "packages": {
-    "bbansi": {
-      "version": "0.1.0",
-      "vcsRevision": "a7eb31407d50bb773bebc8b590ae25fa5af1bbec",
-      "url": "https://github.com/daylinmorgan/bbansi",
-      "downloadMethod": "git",
-      "dependencies": [],
-      "checksums": {
-        "sha1": "1a4ea3d954edf4d76202237e4848ed56e468a0f2"
-      }
-    },
     "cligen": {
       "version": "1.7.0",
       "vcsRevision": "4193f802796f15559c81c6dd56724d6f20345917",
@@ -23,12 +13,32 @@
     },
     "illwill": {
       "version": "0.3.3",
-      "vcsRevision": "6ba6045038a01d1855208c4a9be7d4826d774001",
+      "vcsRevision": "449ae5d2f05aba125d5a71823ff1da55b1766d70",
       "url": "https://github.com/inv2004/illwill/",
       "downloadMethod": "git",
       "dependencies": [],
       "checksums": {
-        "sha1": "c1971885588771d9c413d5b6ade93237e8f1635a"
+        "sha1": "7109f26fc632ceed85e0c48afe55051948c1bc61"
+      }
+    },
+    "bbansi": {
+      "version": "0.1.0",
+      "vcsRevision": "e77ad85cd3a68cabd6ef66727fa1a0cd14c4d0d3",
+      "url": "https://github.com/daylinmorgan/bbansi",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "f47cade0fa02ef944d76e31199762b26389bb9a9"
+      }
+    },
+    "usu": {
+      "version": "0.1.0",
+      "vcsRevision": "25574d165bb7f60900b36590bc49f3d90e47cea4",
+      "url": "https://github.com/usu-dev/usu-nim",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "61a8c13946e3eea9dbe04a6141ed93811563026c"
       }
     }
   },

@@ -2,14 +2,26 @@
   "depends": [
     {
       "method": "fetchzip",
-      "path": "/nix/store/x91md8lmrxxdd4xizg0r9gcbl8sqn8vk-source",
-      "rev": "6ba6045038a01d1855208c4a9be7d4826d774001",
-      "sha256": "13hrcvpynlyr8hqx1h6qkfd32ihg255yd8wmk6l4q6bmiw8frw09",
+      "path": "/nix/store/86prp3nzb853d7isbhgrixw6b8l55gdn-source",
+      "rev": "449ae5d2f05aba125d5a71823ff1da55b1766d70",
+      "sha256": "1vmp1wamfzwcb1rnwvrwsz53sd3k3bqgcpg9c9x29p6q27d1ffdz",
       "srcDir": "",
-      "url": "https://github.com/inv2004/illwill/archive/6ba6045038a01d1855208c4a9be7d4826d774001.tar.gz",
+      "url": "https://github.com/inv2004/illwill/archive/449ae5d2f05aba125d5a71823ff1da55b1766d70.tar.gz",
       "subDir": "",
       "packages": [
         "illwill"
+      ]
+    },
+    {
+      "method": "fetchzip",
+      "path": "/nix/store/pgajs406yg0ffw099np6fca3psf8zlvr-source",
+      "rev": "25574d165bb7f60900b36590bc49f3d90e47cea4",
+      "sha256": "0qf162bagcgnxjsjpg560cz6kdshhsyrkzq3j471a8pxrhwp608i",
+      "srcDir": "src",
+      "url": "https://github.com/usu-dev/usu-nim/archive/25574d165bb7f60900b36590bc49f3d90e47cea4.tar.gz",
+      "subDir": "",
+      "packages": [
+        "usu"
       ]
     },
     {
@@ -26,11 +38,11 @@
     },
     {
       "method": "fetchzip",
-      "path": "/nix/store/8ilhirvpc8qi3jbbh1fi3a8psr780cz4-source",
-      "rev": "a7eb31407d50bb773bebc8b590ae25fa5af1bbec",
-      "sha256": "06s4198pbqjga7nqrvajyxqxx3df83fk3qn21pv7axshl19kh9bq",
+      "path": "/nix/store/m086yq0f29cg98w3b12d70cw7xki1j39-source",
+      "rev": "e77ad85cd3a68cabd6ef66727fa1a0cd14c4d0d3",
+      "sha256": "1l5a5kwviq76kxzagljzpwzc3p43qz7wzs5zvrqi5c59klw1967c",
       "srcDir": "src",
-      "url": "https://github.com/daylinmorgan/bbansi/archive/a7eb31407d50bb773bebc8b590ae25fa5af1bbec.tar.gz",
+      "url": "https://github.com/daylinmorgan/bbansi/archive/e77ad85cd3a68cabd6ef66727fa1a0cd14c4d0d3.tar.gz",
       "subDir": "",
       "packages": [
         "bbansi"

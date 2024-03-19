@@ -1,4 +1,5 @@
-import std/[os, parsecfg, sequtils, tables, strutils]
+import std/[os, sequtils, tables, strutils]
+import usu
 
 import term
 
@@ -10,18 +11,19 @@ type
   Session = object
     name*, dir*: string
 
+# TODO: update when the API for usu is complete
 proc loadConfigFile(): TsmConfig =
-  let configPath = getHomeDir() / ".config/tsm/config.ini"
-  if configPath.fileExists():
-    let iniTable = loadConfig(configPath)
-    if "sessions" in iniTable:
-      for key, value in iniTable["sessions"].pairs:
-        result.sessions.add Session(name: key, dir: value)
-    if "dirs" in iniTable:
-      for key, value in iniTable["dirs"].pairs:
-        if value != "":
-          termError "[dirs] table should only contain a list of paths"
-        result.dirs.add key
+  let configPath = getConfigDir() / "tsm" / "config.usu"
+  if fileExists configPath:
+    let usuNode = parseUsu(readFile configPath)
+    let topFields = usuNode.fields
+    if "dirs" in topFields:
+      for dir in usuNode.fields["dirs"].elems:
+        result.dirs.add dir.value
+    if "sessions" in topFields:
+      for session in usuNode.fields["sessions"].elems:
+        result.sessions.add Session(name: session.fields["name"].value,
+            dir: session.fields["dir"].value)
 
 proc loadTsmConfig*(): TsmConfig =
   result = loadConfigFile()
@@ -30,10 +32,5 @@ proc loadTsmConfig*(): TsmConfig =
     result.dirs = tsmDirs.split(":")
 
 when isMainModule:
-  let dict = loadConfig(getHomeDir() / ".config/tsm/config.ini")
-  let sections = dict.sections().toSeq()
-  if "sessions" in sections:
-    for key, value in dict["sessions"].pairs:
-      echo key, value
+  echo loadConfigFile()
 
-  echo loadTsmConfig()
