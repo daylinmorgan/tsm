@@ -1,7 +1,5 @@
-import std/[os, sequtils, tables, strutils]
+import std/[os, tables, strutils]
 import usu
-
-import term
 
 type
   TsmConfig* = object
@@ -13,7 +11,7 @@ type
 
 # TODO: update when the API for usu is complete
 proc loadConfigFile(): TsmConfig =
-  let configPath = getConfigDir() / "tsm" / "config.usu"
+  let configPath = getEnv("TSM_CONFIG", getConfigDir() / "tsm" / "config.usu")
   if fileExists configPath:
     let usuNode = parseUsu(readFile configPath)
     let topFields = usuNode.fields
