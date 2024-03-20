@@ -2,6 +2,7 @@ import std/[tables]
 
 import selector, project, tmuxutils
 
+# TODO: add option to only opened configured sessions
 proc tsm(open: bool = false) =
   let
     project = selectProject(open)
