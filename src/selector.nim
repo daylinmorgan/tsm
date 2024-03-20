@@ -179,7 +179,11 @@ proc draw() =
 
 proc update(s: var State) =
   s.buffer.width = terminalWidth()
-  s.buffer.height = min(terminalHeight(), maxHeight + state.buffer.inputPad)
+  s.buffer.height = min([
+      terminalHeight(),
+      maxHeight + state.buffer.inputPad,
+      state.buffer.inputPad + state.projects.len
+    ])
   s.cursor.max = s.buffer.height - state.buffer.inputPad
 
 proc clear(b: var Buffer) =
