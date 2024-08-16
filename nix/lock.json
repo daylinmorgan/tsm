@@ -2,11 +2,11 @@
   "depends": [
     {
       "method": "fetchzip",
-      "path": "/nix/store/86prp3nzb853d7isbhgrixw6b8l55gdn-source",
-      "rev": "449ae5d2f05aba125d5a71823ff1da55b1766d70",
-      "sha256": "1vmp1wamfzwcb1rnwvrwsz53sd3k3bqgcpg9c9x29p6q27d1ffdz",
+      "path": "/nix/store/k3sxzm7qnkgnwkrfd8hc3gkwzbayb1h1-source",
+      "rev": "99a120f7f69868b94f5d35ce7e21dd12535de70c",
+      "sha256": "0hiic5yjsaw6sgl1jzmfpm5g6a5ckzmd29c3pzg30glchn2g94sk",
       "srcDir": "",
-      "url": "https://github.com/inv2004/illwill/archive/449ae5d2f05aba125d5a71823ff1da55b1766d70.tar.gz",
+      "url": "https://github.com/johnnovak/illwill/archive/99a120f7f69868b94f5d35ce7e21dd12535de70c.tar.gz",
       "subDir": "",
       "packages": [
         "illwill"

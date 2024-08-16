@@ -11,6 +11,16 @@
         "sha1": "b338433f9a7a1b788b7583674c2b14096ced29ee"
       }
     },
+    "illwill": {
+      "version": "0.4.1",
+      "vcsRevision": "99a120f7f69868b94f5d35ce7e21dd12535de70c",
+      "url": "https://github.com/johnnovak/illwill",
+      "downloadMethod": "git",
+      "dependencies": [],
+      "checksums": {
+        "sha1": "9c58351502f89a16caf031cbd1992ad3fdfd3c67"
+      }
+    },
     "usu": {
       "version": "0.1.0",
       "vcsRevision": "25574d165bb7f60900b36590bc49f3d90e47cea4",
@@ -29,16 +39,6 @@
       "dependencies": [],
       "checksums": {
         "sha1": "300bd7fdb6e48d2d98e34ed0661206b50331e99c"
-      }
-    },
-    "illwill": {
-      "version": "0.3.3",
-      "vcsRevision": "449ae5d2f05aba125d5a71823ff1da55b1766d70",
-      "url": "https://github.com/inv2004/illwill/",
-      "downloadMethod": "git",
-      "dependencies": [],
-      "checksums": {
-        "sha1": "7109f26fc632ceed85e0c48afe55051948c1bc61"
       }
     }
   },
