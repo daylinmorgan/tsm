@@ -8,21 +8,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: jiro4989/setup-nim-action@v1
+      - uses: jiro4989/setup-nim-action@v2
         with:
-          nim-version: 2.0.0
+          nim-version: 2.0.8
 
       - uses: goto-bus-stop/setup-zig@v2
 
       - name: Setup Build Environment
         run: |
           nimble install -Y 'https://github.com/nim-lang/atlas.git@#f7ade65f' forge
-          atlas init --deps:.workspace
-          atlas install
+          nimble install -Y -d
 
       - name: Create artifact bundles
         run: nim release && nim bundle
