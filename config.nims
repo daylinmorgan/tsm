@@ -18,10 +18,9 @@ task bundle, "package build assets":
   withDir "dist":
     for dir in listDirs("."):
       echo dir
-      let cmd = if "windows" in dir:
-        &"7z a {dir}.zip {dir}"
-      else:
-        &"tar czf {dir}.tar.gz {dir}"
+      let cmd =
+        if "windows" in dir: &"7z a {dir}.zip {dir}"
+        else: &"tar czf {dir}.tar.gz {dir}"
       cpFile("../README.md", &"{dir}/README.md")
       exec cmd
 
