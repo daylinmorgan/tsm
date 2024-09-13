@@ -10,18 +10,16 @@ type
     open*: bool
     matched*: bool
 
-proc pathToName(path: string): string = splitPath(path)[1].replace(".", "_")
+proc pathToName(path: string): string =
+  splitPath(path)[1].replace(".", "_")
 
-proc newProject(
-  path: string,
-  open: bool,
-  name = "",
-  named: bool = false
-): Project =
+proc newProject(path: string, open: bool, name = "", named: bool = false): Project =
   result.location = path
   result.name =
-    if name != "": name
-   else: path.pathToName()
+    if name != "":
+      name
+    else:
+      path.pathToName()
   result.updated = getLastModificationTime(path)
   result.open = open
   result.named = named
@@ -37,7 +35,7 @@ proc getTsmDirs(): seq[string] =
   result = tsmDirs.split(":")
 
 proc findDuplicateProjects(
-  paths: seq[string], sessions: var HashSet[string]
+    paths: seq[string], sessions: var HashSet[string]
 ): seq[Project] =
   var candidates: Table[string, seq[string]]
   for p in paths:
@@ -45,18 +43,26 @@ proc findDuplicateProjects(
 
   let maxExtra = min(candidates.values.toSeq.mapIt(it.len))
   for i in 2..maxExtra:
-    let deduplicated = collect:
-      for path, pathSplit in candidates.pairs:
-        (name: pathSplit[^i..^1].joinPath, path: path)
+    let
+      deduplicated =
+        collect:
+          for path, pathSplit in candidates.pairs:
+            (name: pathSplit[^i..^1].joinPath, path: path)
     if deduplicated.mapIt(it[0]).toHashSet.len == candidates.len:
       for (name, path) in deduplicated:
         let open = name in sessions
         result.add newProject(path, open, name)
-        if open: sessions.excl name
+        if open:
+          sessions.excl name
       break
 
   if result.len == 0:
     termQuit "failed to deduplicate these paths:" & paths.join(", ")
+
+proc `<-`(candidates: var Table[string, seq[string]], path: string) =
+  let name = path.splitPath.tail
+  if candidates.hasKeyOrPut(name, @[path]):
+    candidates[name].add path
 
 proc findProjects*(open: bool = false): seq[Project] =
   let tsmConfig = loadTsmConfig()
@@ -64,11 +70,10 @@ proc findProjects*(open: bool = false): seq[Project] =
   var sessions = tmux.sessions.toHashSet()
 
   for devDir in tsmConfig.dirs:
-    for path in walkDir(devDir):
-      if ({path.kind} * {pcFile, pcLinkToFile}).len > 0: continue
-      let name = path.path.splitPath.tail
-      if candidates.hasKeyOrPut(name, @[path.path]):
-        candidates[name].add path.path
+    for (kind, path) in walkDir(devDir):
+      if ({kind} * {pcFile, pcLinkToFile}).len > 0:
+        continue
+      candidates <- path
 
   for name, paths in candidates.pairs:
     if len(paths) == 1:
@@ -76,28 +81,35 @@ proc findProjects*(open: bool = false): seq[Project] =
         path = paths[0]
         open = path.pathToName in sessions
       result.add newProject(path, open)
-      if open: sessions.excl path.pathToName
+      if open:
+        sessions.excl path.pathToName
     else:
       result &= findDuplicateProjects(paths, sessions)
 
   for session in tsmConfig.sessions:
     if session.name notin sessions:
       result.add newProject(
-        path = session.dir,
-        open = false,
-        name = session.name,
-        named = true
+        path = session.dir, open = false, name = session.name, named = true
       )
 
   if open:
     result = result.filterIt(it.open)
+  let sessionNames = tsmConfig.sessionNames
 
-  # default order
-  # open -> configured -> mod time
-  result.sort do (x, y: Project) -> int:
+  # order open -> configured -> mod time
+  result.sort do(x, y: Project) -> int:
     result = cmp(y.open, x.open)
     if result == 0:
-      result = cmp(y.updated, x.updated)
+      result =
+        if y.name in sessionNames:
+          if x.name in sessionNames:
+            cmp(y.name, x.name)
+          else:
+            1
+        elif x.name in sessionNames:
+          -1
+        else:
+          cmp(y.updated, x.updated)
 
   if sessions.len > 0:
     result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
@@ -107,4 +119,3 @@ proc findProjects*(open: bool = false): seq[Project] =
     termEcho "searched these directories: "
     echo getTsmDirs().mapIt("  " & it).join("\n")
     quit QuitFailure
-

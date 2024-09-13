@@ -1,4 +1,4 @@
-import std/[os, streams, strformat, strutils]
+import std/[os, sequtils, streams, strformat, strutils, ]
 import yaml
 import term
 
@@ -9,6 +9,9 @@ type
 
   Session = object
     name*, dir*: string
+
+proc sessionNames*(tc: TsmConfig): seq[string] = 
+  tc.sessions.mapIt(it.name)
 
 proc loadConfigFile(): TsmConfig =
   let configPath = getEnv("TSM_CONFIG", getConfigDir() / "tsm" / "config.yml")
