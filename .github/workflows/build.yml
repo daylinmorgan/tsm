@@ -21,7 +21,7 @@ jobs:
       - name: Setup Build Environment
         run: |
           nimble install -Y 'https://github.com/nim-lang/atlas.git@#f7ade65f' forge
-          nimble install -Y -d
+          nimble setup -Y -l
 
       - name: Create artifact bundles
         run: nim release && nim bundle
