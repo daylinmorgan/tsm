@@ -1,9 +1,6 @@
 import std/[enumerate, os, strformat, strutils, terminal]
-
 from illwill import illwillDeinit, illwillInit, getKey, Key
-import term
-
-import project
+import term, project
 
 func toStr(k: Key): string = $chr(ord(k))
 
@@ -75,8 +72,8 @@ proc scrollUp() =
     dec state.projectIdx
 
 proc scrollDown() =
-  if (state.projects.len - state.projectIdx) > (state.buffer.height -
-      state.buffer.inputPad):
+  if (state.projects.len - state.projectIdx) >
+      (state.buffer.height - state.buffer.inputPad):
     inc state.projectIdx
 
 proc up() =
@@ -143,7 +140,7 @@ proc addProject(b: var Buffer, project: Project, selected: bool) =
     var displayName = fmt"[red]{input}[/]"
     if input.len < name.len:
       # bbansi missing add(string, bbstring) interface
-      displayName = displayName & fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
+      displayName &= fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
     b.addLine(cur & $displayName.bb)
   else:
     b.addLine(cur & $name.bb(project.highlight))
@@ -152,6 +149,7 @@ proc addProjectCount(b: var Buffer) =
   let
     maxNumProjects = state.buffer.height - state.buffer.inputPad
     numProjects = state.projects.len
+  # TODO: use variables here for readability
   b.addLine $(fmt"[[{state.projectIdx+1}-{state.projectIdx + min(maxNumProjects, numProjects)}/{numProjects}]".bb("faint"))
 
 proc addProjects(b: var Buffer) =
@@ -201,9 +199,9 @@ proc exitProc() {.noconv.} =
   state.buffer.clear
   showCursor()
 
-proc selectProject*(open: bool = false): Project =
+proc selectProject*(projects: seq[Project]): Project =
 
-  state.projects = findProjects(open)
+  state.projects = projects
   illwillInit(fullscreen = false)
   setControlCHook(quitProc)
   hideCursor()
@@ -217,10 +215,8 @@ proc selectProject*(open: bool = false): Project =
     of Key.Enter:
       exitProc()
       return getProject()
-    of Key.Up:
-      up()
-    of Key.Down:
-      down()
+    of Key.Up: up()
+    of Key.Down: down()
     of Key.CtrlA..Key.CtrlL, Key.CtrlN..Key.CtrlZ, Key.CtrlRightBracket,
         Key.CtrlBackslash, Key.Right..Key.F12:
       state.lastKey = key
@@ -240,6 +236,7 @@ proc selectProject*(open: bool = false): Project =
 
 
 when isMainModule:
-  let selected = selectProject()
+  projects = findProjects(open)
+  let selected = selectProject(projects)
   echo "selected project -> " & $selected.name
 

@@ -1,5 +1,6 @@
-import std/[os, tables, strutils]
-import usu
+import std/[os, streams, strformat, strutils]
+import yaml
+import term
 
 type
   TsmConfig* = object
@@ -9,19 +10,16 @@ type
   Session = object
     name*, dir*: string
 
-# TODO: update when the API for usu is complete
 proc loadConfigFile(): TsmConfig =
-  let configPath = getEnv("TSM_CONFIG", getConfigDir() / "tsm" / "config.usu")
-  if fileExists configPath:
-    let usuNode = parseUsu(readFile configPath)
-    let topFields = usuNode.fields
-    if "dirs" in topFields:
-      for dir in usuNode.fields["dirs"].elems:
-        result.dirs.add dir.value
-    if "sessions" in topFields:
-      for session in usuNode.fields["sessions"].elems:
-        result.sessions.add Session(name: session.fields["name"].value,
-            dir: session.fields["dir"].value)
+  let configPath = getEnv("TSM_CONFIG", getConfigDir() / "tsm" / "config.yml")
+  try:
+    var s = newFileStream(configPath)
+    load(s, result)
+    s.close()
+  except:
+    termError fmt(
+      "failed to load config file\npath: {configPath}\nmessage: {getCurrentExceptionMsg()}"
+    )
 
 proc loadTsmConfig*(): TsmConfig =
   result = loadConfigFile()
@@ -31,4 +29,3 @@ proc loadTsmConfig*(): TsmConfig =
 
 when isMainModule:
   echo loadConfigFile()
-

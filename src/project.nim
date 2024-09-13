@@ -12,8 +12,12 @@ type
 
 proc pathToName(path: string): string = splitPath(path)[1].replace(".", "_")
 
-proc newProject(path: string, open: bool, name = "",
-    named: bool = false): Project =
+proc newProject(
+  path: string,
+  open: bool,
+  name = "",
+  named: bool = false
+): Project =
   result.location = path
   result.name =
     if name != "": name
@@ -78,18 +82,22 @@ proc findProjects*(open: bool = false): seq[Project] =
 
   for session in tsmConfig.sessions:
     if session.name notin sessions:
-      result.add newProject(path = session.dir, open = false,
-          name = session.name, named = true)
+      result.add newProject(
+        path = session.dir,
+        open = false,
+        name = session.name,
+        named = true
+      )
 
   if open:
     result = result.filterIt(it.open)
 
-  # favor open projects then by update time
+  # default order
+  # open -> configured -> mod time
   result.sort do (x, y: Project) -> int:
     result = cmp(y.open, x.open)
     if result == 0:
       result = cmp(y.updated, x.updated)
-
 
   if sessions.len > 0:
     result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
