@@ -150,7 +150,10 @@ proc addProjectCount(b: var Buffer) =
     maxNumProjects = state.buffer.height - state.buffer.inputPad
     numProjects = state.projects.len
   # TODO: use variables here for readability
-  b.addLine $(fmt"[[{state.projectIdx+1}-{state.projectIdx + min(maxNumProjects, numProjects)}/{numProjects}]".bb("faint"))
+  let 
+    low= state.projectIdx+1
+    high = state.projectIdx + min(maxNumProjects, numProjects)
+  b.addLine $(fmt"[[{low}-{high}/{numProjects}]".bb("faint"))
 
 proc addProjects(b: var Buffer) =
   let
