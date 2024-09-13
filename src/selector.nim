@@ -2,7 +2,8 @@ import std/[enumerate, os, strformat, strutils, terminal]
 from illwill import illwillDeinit, illwillInit, getKey, Key
 import term, project
 
-func toStr(k: Key): string = $chr(ord(k))
+func toStr(k: Key): string =
+  $chr(ord(k))
 
 proc getMaxHeight(): int =
   result = 10
@@ -12,7 +13,6 @@ proc getMaxHeight(): int =
       result = parseInt(setting)
     except ValueError:
       termQuit fmt"failed to parse TSM_HEIGHT of `{setting}`, expected integer"
-
 
 let maxHeight = getMaxHeight()
 
@@ -41,7 +41,7 @@ proc addLine(b: var Buffer, text: string) =
   b.buffer.add ("  " & text).alignLeft(b.width) & "\n"
 
 proc addDivider(b: var Buffer) =
-  b.addLine "─".repeat(b.width-2)
+  b.addLine "─".repeat(b.width - 2)
 
 proc addInput(b: var Buffer) =
   b.addLine "$ " & state.input
@@ -59,9 +59,7 @@ proc draw(b: var Buffer) =
     stdout.writeLine ""
     stdout.writeLine "DEBUG INFO -------------"
     stdout.writeLine $state.cursor
-    stdout.writeLine(
-      alignLeft("Key: " & $(state.lastKey), b.Buffer.width)
-    )
+    stdout.writeLine(alignLeft("Key: " & $(state.lastKey), b.Buffer.width))
     stdout.cursorUp(b.numLines + 4)
   else:
     stdout.cursorUp(b.numLines)
@@ -72,8 +70,9 @@ proc scrollUp() =
     dec state.projectIdx
 
 proc scrollDown() =
-  if (state.projects.len - state.projectIdx) >
-      (state.buffer.height - state.buffer.inputPad):
+  if (state.projects.len - state.projectIdx) > (
+    state.buffer.height - state.buffer.inputPad
+  ):
     inc state.projectIdx
 
 proc up() =
@@ -89,7 +88,8 @@ proc down() =
     scrollDown()
 
 proc backspace(s: string): string =
-  if s != "": result = s[0..^2]
+  if s != "":
+    result = s[0..^2]
 
 proc match(project: Project): Project =
   result = project
@@ -97,7 +97,6 @@ proc match(project: Project): Project =
 
 # TODO: convert this into a proper sorter
 proc sortProjects(): seq[Project] =
-
   var
     priority: seq[Project]
     rest: seq[Project]
@@ -116,19 +115,23 @@ proc getProject(): Project =
   var idx = state.cursor.y - state.cursor.min + state.projectIdx
   return projects[idx]
 
-
 proc clip(s: string): string =
   let maxWidth = state.buffer.width - 2
   result =
     if s.len > maxWidth:
       s[0..^maxWidth]
-    else: s
+    else:
+      s
 
 proc highlight(p: Project): string =
-  if p.location == "": "green"
-  elif p.open: "yellow"
-  elif p.named: "bold cyan"
-  else: "default"
+  if p.location == "":
+    "green"
+  elif p.open:
+    "yellow"
+  elif p.named:
+    "bold cyan"
+  else:
+    "default"
 
 proc addProject(b: var Buffer, project: Project, selected: bool) =
   let
@@ -140,7 +143,8 @@ proc addProject(b: var Buffer, project: Project, selected: bool) =
     var displayName = fmt"[red]{input}[/]"
     if input.len < name.len:
       # bbansi missing add(string, bbstring) interface
-      displayName &= fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
+      displayName &=
+        fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
     b.addLine(cur & $displayName.bb)
   else:
     b.addLine(cur & $name.bb(project.highlight))
@@ -150,8 +154,8 @@ proc addProjectCount(b: var Buffer) =
     maxNumProjects = state.buffer.height - state.buffer.inputPad
     numProjects = state.projects.len
   # TODO: use variables here for readability
-  let 
-    low= state.projectIdx+1
+  let
+    low = state.projectIdx + 1
     high = state.projectIdx + min(maxNumProjects, numProjects)
   b.addLine $(fmt"[[{low}-{high}/{numProjects}]".bb("faint"))
 
@@ -164,7 +168,8 @@ proc addProjects(b: var Buffer) =
   for (i, project) in enumerate(projects[state.projectIdx..^1]):
     b.addProject(project, state.cursor.y == numProjects)
     inc numProjects
-    if numProjects > maxNumProjects: break
+    if numProjects > maxNumProjects:
+      break
 
 proc reset() =
   state.cursor.y = state.cursor.min
@@ -180,11 +185,14 @@ proc draw() =
 
 proc update(s: var State) =
   s.buffer.width = terminalWidth()
-  s.buffer.height = min([
-      terminalHeight(),
-      maxHeight + state.buffer.inputPad,
-      state.buffer.inputPad + state.projects.len
-    ])
+  s.buffer.height =
+    min(
+      [
+        terminalHeight(),
+        maxHeight + state.buffer.inputPad,
+        state.buffer.inputPad + state.projects.len
+      ]
+    )
   s.cursor.max = s.buffer.height - state.buffer.inputPad
 
 proc clear(b: var Buffer) =
@@ -203,7 +211,6 @@ proc exitProc() {.noconv.} =
   showCursor()
 
 proc selectProject*(projects: seq[Project]): Project =
-
   state.projects = projects
   illwillInit(fullscreen = false)
   setControlCHook(quitProc)
@@ -213,15 +220,23 @@ proc selectProject*(projects: seq[Project]): Project =
     state.update()
     var key = getKey()
     case key
-    of Key.None: discard
-    of Key.Escape: quitProc()
+    of Key.None:
+      discard
+    of Key.Escape:
+      quitProc()
     of Key.Enter:
       exitProc()
       return getProject()
-    of Key.Up: up()
-    of Key.Down: down()
-    of Key.CtrlA..Key.CtrlL, Key.CtrlN..Key.CtrlZ, Key.CtrlRightBracket,
-        Key.CtrlBackslash, Key.Right..Key.F12:
+    of Key.Up:
+      up()
+    of Key.Down:
+      down()
+    of
+        Key.CtrlA..Key.CtrlL,
+        Key.CtrlN..Key.CtrlZ,
+        Key.CtrlRightBracket,
+        Key.CtrlBackslash,
+        Key.Right..Key.F12:
       state.lastKey = key
     else:
       reset()
@@ -237,9 +252,7 @@ proc selectProject*(projects: seq[Project]): Project =
     draw()
     sleep(10)
 
-
 when isMainModule:
   projects = findProjects(open)
   let selected = selectProject(projects)
   echo "selected project -> " & $selected.name
-

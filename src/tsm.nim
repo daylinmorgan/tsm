@@ -20,24 +20,23 @@ when isMainModule:
   clCfg.version = vsn
 
   if clCfg.helpAttr.len == 0:
-    clCfg.helpAttr = {
-      "cmd"      : "\e[1;36m",
-      "clDescrip": "",
-      "clDflVal" : "\e[33m",
-      "clOptKeys": "\e[32m",
-      "clValType": "\e[31m",
-      "args"     : "\e[3m"
-    }.toTable
-    clCfg.helpAttrOff = {
-      "cmd"      : "\e[m",
-      "clDescrip": "\e[m",
-      "clDflVal" : "\e[m",
-      "clOptKeys": "\e[m",
-      "clValType": "\e[m",
-      "args"     : "\e[m"
-    }.toTable
+    clCfg.helpAttr =
+      {
+        "cmd": "\e[1;36m",
+        "clDescrip": "",
+        "clDflVal": "\e[33m",
+        "clOptKeys": "\e[32m",
+        "clValType": "\e[31m",
+        "args": "\e[3m"
+      }.toTable
+    clCfg.helpAttrOff =
+      {
+        "cmd": "\e[m",
+        "clDescrip": "\e[m",
+        "clDflVal": "\e[m",
+        "clOptKeys": "\e[m",
+        "clValType": "\e[m",
+        "args": "\e[m"
+      }.toTable
 
-  dispatch(
-    tsm,
-    short = {"version": 'v'},
-  )
+  dispatch(tsm, short = {"version": 'v'})
