@@ -29,9 +29,9 @@ proc newUnknownProject(name: string): Project =
   result.open = true
 
 proc getTsmDirs(): seq[string] =
-  let tsmDirs = getEnv("TSM_DIRS")
+  let tsmDirs = getEnv("TSM_PATHS")
   if tsmDirs == "":
-    termQuit "Please set [yellow]$TSM_DIRS[/] to a colon-delimited list of paths"
+    termQuit "Please set [yellow]$TSM_PATHS[/] to a colon-delimited list of paths"
   result = tsmDirs.split(":")
 
 proc findDuplicateProjects(
@@ -69,7 +69,7 @@ proc findProjects*(open: bool = false): seq[Project] =
   var candidates: Table[string, seq[string]]
   var sessions = tmux.sessions.toHashSet()
 
-  for devDir in tsmConfig.dirs:
+  for devDir in tsmConfig.paths:
     for (kind, path) in walkDir(devDir):
       if ({kind} * {pcFile, pcLinkToFile}).len > 0:
         continue
@@ -89,7 +89,7 @@ proc findProjects*(open: bool = false): seq[Project] =
   for session in tsmConfig.sessions:
     if session.name notin sessions:
       result.add newProject(
-        path = session.dir, open = false, name = session.name, named = true
+        path = session.path, open = false, name = session.name, named = true
       )
 
   if open:
@@ -102,14 +102,10 @@ proc findProjects*(open: bool = false): seq[Project] =
     if result == 0:
       result =
         if y.name in sessionNames:
-          if x.name in sessionNames:
-            cmp(y.name, x.name)
-          else:
-            1
-        elif x.name in sessionNames:
-          -1
-        else:
-          cmp(y.updated, x.updated)
+          if x.name in sessionNames: cmp(y.name, x.name)
+          else: 1
+        elif x.name in sessionNames: -1
+        else: cmp(y.updated, x.updated)
 
   if sessions.len > 0:
     result = sessions.toSeq().mapIt(newUnknownProject(it)) & result

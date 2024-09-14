@@ -18,13 +18,13 @@ nimble install https://github.com/daylinmorgan/tsm
 ## Usage
 
 To configure `tsm` export the below environment variables:
-> `TSM_DIRS`: a colon-delimited set of parent directories to find projects. \
+> `TSM_PATHS`: a colon-delimited set of parent directories to find projects. \
 > `TSM_HEIGHT`: integer specifying number of rows in terminal (default: 15)
 
 For example in your rc file:
 
 ```sh
-export TSM_DIRS="$HOME/projects/personal:$HOME/projects/work"
+export TSM_PATHS="$HOME/projects/personal:$HOME/projects/work"
 ```
 
 To make full use of `tsm` you should also add a new key binding to your `tmux.conf`.
