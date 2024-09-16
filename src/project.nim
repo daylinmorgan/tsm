@@ -111,7 +111,7 @@ proc findProjects*(open: bool = false): seq[Project] =
     result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
 
   if len(result) == 0:
-    termError "nothing to select, check your [yellow]$TSM_DIRS"
+    termError "nothing to select, check your [yellow]$TSM_PATHS"
     termEcho "searched these directories: "
     echo getTsmDirs().mapIt("  " & it).join("\n")
     quit QuitFailure
