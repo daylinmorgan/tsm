@@ -1,4 +1,4 @@
-import std/[os, sequtils, strformat, strutils, parsecfg, tables]
+import std/[os, sequtils, strformat, strutils, tables]
 import usu
 import term
 

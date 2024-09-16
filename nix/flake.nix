@@ -39,11 +39,14 @@
         };
       });
       packages = forAllSystems (pkgs: {
-        tsm = pkgs.buildNimblePackage {
+        tsm = pkgs.buildNimblePackage rec {
           pname = "tsm";
-          version = "2024.1001";
+          version = "2024.1001-unstable";
           src = ../.;
-          nimbleDepsHash = "sha256-ugu+bNCWukWSALzD0/i73d0O2kty85J824tHsmfWRDI=";
+          nimbleDepsHash = "sha256-1J0Wt/XjFiSN1MTfgg9tE5dY3GnXH/UgG3zCL19GgpU=";
+          nimFlags = [
+            "-d:TsmVersion=v${version}"
+          ];
         };
         default = self.packages.${pkgs.system}.tsm;
       });

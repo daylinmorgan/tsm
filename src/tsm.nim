@@ -14,10 +14,16 @@ proc tsm(open: bool = false) =
   else:
     tmux.attach project.name
 
+proc getVersion(): string =
+  const tsmVersion {.strdefine.} = "unknown"
+  const gitVersion = staticExec "git describe --tags --always HEAD --match 'v*'"
+  when tsmVersion != "unknown": tsmVersion
+  else: gitVersion
+
+
 when isMainModule:
   import cligen
-  const vsn = staticExec "git describe --tags --always HEAD --match 'v*'"
-  clCfg.version = vsn
+  clCfg.version = getVersion()
 
   if clCfg.helpAttr.len == 0:
     clCfg.helpAttr =
