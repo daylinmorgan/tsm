@@ -1,4 +1,4 @@
-import std/[enumerate, os, strformat, strutils, terminal]
+import std/[enumerate, os, strformat, strutils, terminal, sequtils]
 from illwill import illwillDeinit, illwillInit, getKey, Key
 import term, project
 
@@ -22,10 +22,10 @@ type
     max: Natural
 
   Buffer = object
-    height: int
-    width: int
+    height: Natural
+    width: Natural
     buffer: string
-    inputPad: int = 3
+    inputPad: Natural = 3
 
   State = object
     buffer: Buffer
@@ -37,30 +37,39 @@ type
 
 var state = State()
 
-proc addLine(b: var Buffer, text: string) =
+func addLine(b: var Buffer, text: string) =
   b.buffer.add ("  " & text).alignLeft(b.width) & "\n"
 
-proc addDivider(b: var Buffer) =
+func addDivider(b: var Buffer) =
   b.addLine "─".repeat(b.width - 2)
 
 proc addInput(b: var Buffer) =
   b.addLine "$ " & state.input
 
-proc numLines(b: Buffer): int =
+func numLines(b: Buffer): int =
   b.buffer.count '\n'
+
+func clip(
+  s: string,
+  width: int = state.buffer.width - 3
+): string =
+  result =
+    if s.len > width: s[0..width]
+    else: s
 
 proc draw(b: var Buffer) =
   while b.numLines < b.height:
     b.addLine ""
-
   stdout.write(b.buffer)
 
-  when defined(debug):
+  when defined(debugSelect):
     stdout.writeLine ""
-    stdout.writeLine "DEBUG INFO -------------"
+    stdout.writeLine "DEBUG INFO:"
     stdout.writeLine $state.cursor
-    stdout.writeLine(alignLeft("Key: " & $(state.lastKey), b.Buffer.width))
-    stdout.cursorUp(b.numLines + 4)
+    stdout.writeLine alignLeft("Key: " & $(state.lastKey), b.Buffer.width)
+    stdout.writeLine "(w: $1, h: $2)" % [$b.width, $b.height]
+    stdout.writeLine "-".repeat(b.width)
+    stdout.cursorUp  b.numLines + 6
   else:
     stdout.cursorUp(b.numLines)
   stdout.flushFile()
@@ -87,11 +96,11 @@ proc down() =
   elif state.cursor.y == state.cursor.max:
     scrollDown()
 
-proc backspace(s: string): string =
+func backspace(s: string): string =
   if s != "":
     result = s[0..^2]
 
-proc match(project: Project): Project =
+func match(project: Project): Project =
   result = project
   result.matched = true
 
@@ -111,27 +120,16 @@ proc sortProjects(): seq[Project] =
   return priority & rest
 
 proc getProject(): Project =
+  # NOTE: do i need to call sortProjects again here?
   let projects = sortProjects()
   var idx = state.cursor.y - state.cursor.min + state.projectIdx
   return projects[idx]
 
-proc clip(s: string): string =
-  let maxWidth = state.buffer.width - 2
-  result =
-    if s.len > maxWidth:
-      s[0..^maxWidth]
-    else:
-      s
-
-proc highlight(p: Project): string =
-  if p.location == "":
-    "green"
-  elif p.open:
-    "yellow"
-  elif p.named:
-    "bold cyan"
-  else:
-    "default"
+func highlight(p: Project): string =
+  if p.location == "": "green"
+  elif p.open: "yellow"
+  elif p.named: "bold cyan"
+  else: "default"
 
 proc addProject(b: var Buffer, project: Project, selected: bool) =
   let
@@ -148,15 +146,14 @@ proc addProject(b: var Buffer, project: Project, selected: bool) =
   else:
     b.addLine(cur & $name.bb(project.highlight))
 
-proc addProjectCount(b: var Buffer) =
+proc addInfoLine(b: var Buffer) =
   let
     maxNumProjects = state.buffer.height - state.buffer.inputPad
     numProjects = state.projects.len
-  # TODO: use variables here for readability
-  let
     low = state.projectIdx + 1
     high = state.projectIdx + min(maxNumProjects, numProjects)
-  b.addLine $(fmt"[[{low}-{high}/{numProjects}]".bb("faint"))
+    infoLine = fmt"[[{low}-{high}/{numProjects}] Ctrl+E to new session"
+  b.addLine $(infoLine.clip(state.buffer.width - 2).bb("faint"))
 
 proc addProjects(b: var Buffer) =
   let
@@ -178,7 +175,7 @@ proc draw() =
   var buffer = state.buffer
   buffer.addInput
   buffer.addDivider
-  buffer.addProjectCount
+  buffer.addInfoLine
   buffer.addProjects
   buffer.draw
 
@@ -230,8 +227,16 @@ proc selectProject*(projects: seq[Project]): Project =
       up()
     of Key.Down:
       down()
+    of Key.CtrlE:
+      exitProc()
+      return newProject(
+        path = getCurrentDir(),
+        name = state.input,
+        open = false,
+      )
     of
-        Key.CtrlA..Key.CtrlL,
+        Key.CtrlA..Key.CtrlD,
+        Key.CtrlF..Key.CtrlL,
         Key.CtrlN..Key.CtrlZ,
         Key.CtrlRightBracket,
         Key.CtrlBackslash,
@@ -252,6 +257,6 @@ proc selectProject*(projects: seq[Project]): Project =
     sleep(10)
 
 when isMainModule:
-  projects = findProjects(open)
+  let projects = findProjects(false)
   let selected = selectProject(projects)
-  echo "selected project -> " & $selected.name
+  echo "selected project -> " & $selected

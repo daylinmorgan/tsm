@@ -13,7 +13,7 @@ type
 proc pathToName(path: string): string =
   splitPath(path)[1].replace(".", "_")
 
-proc newProject(path: string, open: bool, name = "", named: bool = false): Project =
+proc newProject*(path: string, open: bool, name = "", named: bool = false): Project =
   result.location = path
   result.name =
     if name != "":
@@ -24,7 +24,7 @@ proc newProject(path: string, open: bool, name = "", named: bool = false): Proje
   result.open = open
   result.named = named
 
-proc newUnknownProject(name: string): Project =
+proc newUnknownProject*(name: string): Project =
   result.name = name
   result.open = true
 

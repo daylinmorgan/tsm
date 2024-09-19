@@ -2,13 +2,10 @@
 /dist
 /bin
 
-# atlas
-src/nim.cfg
-*.workspace
-
 # nimble
 nimbledeps
 nimble.develop
 nimble.paths
 
 result
+src/selector

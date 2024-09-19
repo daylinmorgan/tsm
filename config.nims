@@ -2,19 +2,19 @@ import std/[strformat, strutils]
 
 
 task debugSelect, "debug select":
-  exec "nim -d:debug c -r src/selector.nim"
+  exec "nim -d:debugSelect c -r src/selector.nim"
 
 task build, "build app":
   selfExec "c -o:bin/tsm src/tsm.nim"
 
-task buildRelease, "build app":
+task buildRelease, "build release app":
   selfExec "c -d:release -o:bin/tsm src/tsm.nim"
 
-task release, "build release assets":
+task release, "build release assets w/forge":
   version = (gorgeEx "git describe --tags --always --match 'v*'").output
   exec &"forge release -v {version} -V"
 
-task bundle, "package build assets":
+task bundle, "package forge build assets":
   withDir "dist":
     for dir in listDirs("."):
       echo dir
