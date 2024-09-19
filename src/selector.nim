@@ -142,7 +142,6 @@ proc addProject(b: var Buffer, project: Project, selected: bool) =
   if project.matched:
     var displayName = fmt"[red]{input}[/]"
     if input.len < name.len:
-      # bbansi missing add(string, bbstring) interface
       displayName &=
         fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
     b.addLine(cur & $displayName.bb)

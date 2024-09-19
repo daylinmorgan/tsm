@@ -1,6 +1,7 @@
 import std/strutils
-import bbansi
-export bbansi
+import hwylterm
+export hwylterm
+
 const
   sep = " [magenta]|[/] "
   prefix = "[cyan]tsm[/]" & sep
