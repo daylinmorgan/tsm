@@ -35,7 +35,8 @@ proc getTsmDirs(): seq[string] =
   result = tsmDirs.split(":")
 
 proc findDuplicateProjects(
-    paths: seq[string], sessions: var HashSet[string]
+    paths: seq[string],
+    sessions: var HashSet[string]
 ): seq[Project] =
   var candidates: Table[string, seq[string]]
   for p in paths:
@@ -71,7 +72,7 @@ proc findProjects*(open: bool = false): seq[Project] =
 
   for devDir in tsmConfig.paths:
     for (kind, path) in walkDir(devDir):
-      if ({kind} * {pcFile, pcLinkToFile}).len > 0:
+      if ({kind} * {pcFile, pcLinkToFile}).len > 0 or path.splitPath.tail.startsWith("."):
         continue
       candidates <- path
 
