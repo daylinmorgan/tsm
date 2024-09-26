@@ -27,7 +27,7 @@ proc loadConfigFile(): TsmConfig =
     let topFields = usuNode.fields
     if "paths" in topFields:
       for p in usuNode.fields["paths"].elems:
-        result.paths.add p.value
+        result.paths.add p.value.strip() # usu is adding a newline....
     if "sessions" in topFields:
       for session in usuNode.fields["sessions"].elems:
         result.sessions.add Session(
