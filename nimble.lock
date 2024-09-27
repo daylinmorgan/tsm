@@ -2,23 +2,23 @@
   "version": 2,
   "packages": {
     "cligen": {
-      "version": "1.7.0",
-      "vcsRevision": "4193f802796f15559c81c6dd56724d6f20345917",
+      "version": "1.7.5",
+      "vcsRevision": "85daafd76b0104387f50ff3f75c829b4c2804412",
       "url": "https://github.com/c-blake/cligen.git",
       "downloadMethod": "git",
       "dependencies": [],
       "checksums": {
-        "sha1": "300bd7fdb6e48d2d98e34ed0661206b50331e99c"
+        "sha1": "f3ffe7329c8db755677d3ca377d02ff176cec8b1"
       }
     },
     "hwylterm": {
       "version": "0.1.0",
-      "vcsRevision": "9afc339a9791f25010ea89a4f52204ad8eeda858",
+      "vcsRevision": "c2bcfd1f73dda97bd3e209c89e2abfe588f0977c",
       "url": "https://github.com/daylinmorgan/hwylterm",
       "downloadMethod": "git",
       "dependencies": [],
       "checksums": {
-        "sha1": "853c67ee7f789d825ec6f46c9fbae68e03e43cdb"
+        "sha1": "1932229840c893c39acca0b50def19913678f5f0"
       }
     },
     "illwill": {
@@ -33,12 +33,12 @@
     },
     "usu": {
       "version": "0.1.0",
-      "vcsRevision": "25574d165bb7f60900b36590bc49f3d90e47cea4",
+      "vcsRevision": "ab2406bd5b857f44c9ebee8ed5f7287b30e089dd",
       "url": "https://github.com/usu-dev/usu-nim",
       "downloadMethod": "git",
       "dependencies": [],
       "checksums": {
-        "sha1": "61a8c13946e3eea9dbe04a6141ed93811563026c"
+        "sha1": "f9414616e9e7b225257b78caeb7438a52347f010"
       }
     }
   },
