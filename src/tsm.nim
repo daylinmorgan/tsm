@@ -1,6 +1,4 @@
-import std/[tables]
-
-import selector, project, tmuxutils
+import ./[selector, project, tmuxutils]
 
 # TODO: add option to only opened configured sessions
 proc tsm(open: bool = false) =
@@ -14,16 +12,44 @@ proc tsm(open: bool = false) =
   else:
     tmux.attach project.name
 
-proc getVersion(): string =
-  const tsmVersion {.strdefine.} = "unknown"
-  const gitVersion = staticExec "git describe --tags --always HEAD --match 'v*'"
-  when tsmVersion != "unknown": tsmVersion
-  else: gitVersion
-
 
 when isMainModule:
-  import cligen, hwylterm, hwylterm/cli
-  clCfg.version = getVersion()
-  hwylCli(clCfg)
-  let clUse* = $bb("$command $args\n${doc}[bold]Options[/]:\n$options")
-  dispatch(tsm, usage = clUse, short = {"version": 'v'})
+  import std/parseopt
+  import hwylterm, hwylterm/cli
+
+  const tsmVersion {.strdefine.} = staticExec "git describe --tags --always HEAD --match 'v*'"
+  proc help() =
+    echo newHwylCli(
+      """tmux session manager
+
+[bold]tsm[/] [[[faint]-h|-v|-o[/]]""",
+
+      flags = [
+        ("h","help","show this help"),
+        ("v","version", "print version"),
+        ("o","open", "only search open sessions")
+      ]
+    )
+  var open: bool
+  var p = initOptParser(
+    shortNoVal = {'h', 'v', 'o'},
+    longNoVal = @["open"]
+  )
+  for kind, key, val in p.getOpt():
+    case kind:
+    of cmdEnd:
+      break
+    of cmdArgument:
+      echo bb"[red]Error[/]: unexpected positional argument ", bbfmt"[bold]{key}[/]"
+    of cmdShortOption, cmdLongOption:
+      case key:
+      of "help", "h":
+        help(); quit 0
+      of "version", "v":
+        echo "tsm: " & tsmVersion; quit 0
+      of "open", "o":
+        open = true
+      else:
+        echo bbfmt"[red]Error[/]: unknown key value pair", bbfmt"[b]key[/]: {key}, [b]value[/]: {val}"
+
+  tsm(open)

@@ -1,4 +1,4 @@
-import std/[enumerate, os, strformat, strutils, terminal, sequtils]
+import std/[enumerate, os, strformat, strutils, terminal]
 from illwill import illwillDeinit, illwillInit, getKey, Key
 import term, project
 
@@ -44,7 +44,12 @@ func addDivider(b: var Buffer) =
   b.addLine "─".repeat(b.width - 2)
 
 proc addInput(b: var Buffer) =
-  b.addLine "$ " & state.input
+  var line = "$ "
+  if state.input != "":
+    line.add state.input
+  else:
+    line.add $pathToName(getCurrentDir()).bb("faint")
+  b.addLine line
 
 func numLines(b: Buffer): int =
   b.buffer.count '\n'

@@ -10,7 +10,7 @@ type
     open*: bool
     matched*: bool
 
-proc pathToName(path: string): string =
+proc pathToName*(path: string): string =
   splitPath(path)[1].replace(".", "_")
 
 proc newProject*(path: string, open: bool, name = "", named: bool = false): Project =
@@ -19,7 +19,7 @@ proc newProject*(path: string, open: bool, name = "", named: bool = false): Proj
     if name != "":
       name
     else:
-      path.pathToName()
+      pathToName(path)
   result.updated = getLastModificationTime(path)
   result.open = open
   result.named = named
