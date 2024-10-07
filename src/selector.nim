@@ -132,8 +132,8 @@ proc getProject(): Project =
 
 func highlight(p: Project): string =
   if p.location == "": "green"
-  elif p.open: "yellow"
-  elif p.named: "bold cyan"
+  elif p.open: "bold yellow"
+  elif p.named: "cyan"
   else: "default"
 
 proc addProject(b: var Buffer, project: Project, selected: bool) =
