@@ -17,19 +17,19 @@ when isMainModule:
   import std/parseopt
   import hwylterm, hwylterm/cli
 
-  const tsmVersion {.strdefine.} = staticExec "git describe --tags --always HEAD --match 'v*'"
-  proc help() =
-    echo newHwylCli(
+  const
+    tsmVersion {.strdefine.} =
+      staticExec "git describe --tags --always HEAD --match 'v*'"
+    usage =
       """tmux session manager
 
-[bold]tsm[/] [[[faint]-h|-v|-o[/]]""",
-
-      flags = [
+[bold]tsm[/] [[[faint]-h|-v|-o[/]]"""
+    flags = [
         ("h","help","show this help"),
         ("v","version", "print version"),
         ("o","open", "only search open sessions")
-      ]
-    )
+    ]
+  proc help() = echo newHwylCli(usage, flags = flags)
   var open: bool
   var p = initOptParser(
     shortNoVal = {'h', 'v', 'o'},
