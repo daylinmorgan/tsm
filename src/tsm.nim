@@ -12,6 +12,9 @@ proc tsm(open: bool = false) =
   else:
     tmux.attach project.name
 
+const tsmVersion {.strDefine.} =
+  staticExec "git describe --tags --always HEAD --match 'v*'"
+
 hwylCli:
   name "tsm"
   V tsmVersion

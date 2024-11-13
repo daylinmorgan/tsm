@@ -12,6 +12,6 @@ binDir        = "bin"
 
 requires "nim >= 2.0.0"
 requires "illwill >= 0.4.1"
-requires "https://github.com/daylinmorgan/hwylterm#2a5dce88"
+requires "https://github.com/daylinmorgan/hwylterm#cbeefd67"
 requires "https://github.com/usu-dev/usu-nim"
 
