@@ -1,4 +1,5 @@
 import std/[enumerate, os, strformat, strutils, terminal]
+import hwylterm
 from illwill import illwillDeinit, illwillInit, getKey, Key
 import term, project
 
@@ -34,8 +35,39 @@ type
     cursor: Cursor
     projectIdx: Natural
     projects: seq[Project]
+    selected: seq[Natural]
 
 var state = State()
+
+func clip(
+  s: string,
+  width: int = state.buffer.width - 3
+): string =
+  result =
+    if s.len > width: s[0..width]
+    else: s
+
+func highlight(p: Project): string =
+  if p.location == "": "green"
+  elif p.open: "bold yellow"
+  elif p.named: "cyan"
+  else: "default"
+
+proc display(s: State, p: Project): Bbstring =
+  let
+    name = p.name.clip
+    input = s.input.clip
+
+  if p.matched:
+    result.add input.bb("red")
+    if input.len < name.len:
+      result.add ($name[input.len..^1]).bb(p.highlight)
+  else:
+    result.add name.bb(p.highlight)
+
+  if p.tmuxinfo != "":
+    # will fail without clip!
+    result.add p.tmuxinfo.bb("faint")
 
 func addLine(b: var Buffer, text: string) =
   b.buffer.add ("  " & text).alignLeft(b.width) & "\n"
@@ -53,14 +85,6 @@ proc addInput(b: var Buffer) =
 
 func numLines(b: Buffer): int =
   b.buffer.count '\n'
-
-func clip(
-  s: string,
-  width: int = state.buffer.width - 3
-): string =
-  result =
-    if s.len > width: s[0..width]
-    else: s
 
 proc draw(b: var Buffer) =
   while b.numLines < b.height:
@@ -130,26 +154,6 @@ proc getProject(): Project =
   var idx = state.cursor.y - state.cursor.min + state.projectIdx
   return projects[idx]
 
-func highlight(p: Project): string =
-  if p.location == "": "green"
-  elif p.open: "bold yellow"
-  elif p.named: "cyan"
-  else: "default"
-
-proc addProject(b: var Buffer, project: Project, selected: bool) =
-  let
-    name = project.name.clip
-    input = state.input.clip
-    cur = (if selected: "> " else: "  ")
-
-  if project.matched:
-    var displayName = fmt"[red]{input}[/]"
-    if input.len < name.len:
-      displayName &=
-        fmt"[{project.highlight}]{name[input.len..^1]}[/{project.highlight}]"
-    b.addLine(cur & $displayName.bb)
-  else:
-    b.addLine(cur & $name.bb(project.highlight))
 
 proc addInfoLine(b: var Buffer) =
   let
@@ -162,15 +166,16 @@ proc addInfoLine(b: var Buffer) =
 
 proc addProjects(b: var Buffer) =
   let
-    projects = sortProjects()
-    maxNumProjects = state.buffer.height - state.buffer.inputPad
+    # NOTE: is a bounds error possible?
+    nProjects = min(state.buffer.height - state.buffer.inputPad, state.projects.len() - state.projectIdx)
+    slice = state.projectIdx..<(state.projectIdx + nProjects)
+    projects = sortProjects()[slice]
 
-  var numProjects = 1
-  for (i, project) in enumerate(projects[state.projectIdx..^1]):
-    b.addProject(project, state.cursor.y == numProjects)
-    inc numProjects
-    if numProjects > maxNumProjects:
-      break
+  for (i, project) in enumerate(projects):
+    let cursorArrow =
+      if state.cursor.y == i + 1: "> "
+      else: "  "
+    b.addLine(cursorArrow & $display(state, project))
 
 proc reset() =
   state.cursor.y = state.cursor.min

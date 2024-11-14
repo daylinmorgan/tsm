@@ -1,12 +1,15 @@
-import std/[os, osproc, strformat, strutils]
+import std/[os, osproc, strformat, strutils, sequtils]
 
 import term
 
 type
-  Tmux = object
-    active: bool
-    sessions*: seq[string]
-
+  TmuxSession* = object
+    name*: string
+    info*: string
+  Tmux* = object
+    active*: bool
+    sessions*: seq[TmuxSession]
+ 
 proc checkExe(names: varargs[string]) =
   for name in names:
     if findExe(name) == "":
@@ -33,11 +36,18 @@ template cmd(tmux: Tmux, args: string) =
     tmuxError(args)
   # discard tmux.cmdGet args
 
+proc toSession(s: string): TmuxSession = 
+  let ss = s.split(":", 1)
+  if ss.len != 2:
+    tmuxError "failed to parse session info from: " & s
+  result.name = ss[0]
+  result.info = ss[1]
+
 proc newTmux(): Tmux =
   result.active = existsEnv("TMUX")
   # check if server is active
   if execCmdEx("tmux run").exitCode == 0:
-    result.sessions = (result.cmdGet "list-sessions -F '#S'").strip().split("\n")
+    result.sessions = (result.cmdGet "list-sessions").strip().split("\n").mapIt(toSession(it))
 
 proc attach*(t: Tmux, session: string) =
   let args = if t.active: "switch-client -t" else: "attach -t"

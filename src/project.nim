@@ -9,6 +9,7 @@ type
     updated*: Time
     open*: bool
     matched*: bool
+    tmuxinfo*: string
 
 proc pathToName*(path: string): string =
   splitPath(path)[1].replace(".", "_")
@@ -16,10 +17,8 @@ proc pathToName*(path: string): string =
 proc newProject*(path: string, open: bool, name = "", named: bool = false): Project =
   result.location = path
   result.name =
-    if name != "":
-      name
-    else:
-      pathToName(path)
+    if name != "": name
+    else: pathToName(path)
   result.updated = getLastModificationTime(path)
   result.open = open
   result.named = named
@@ -65,10 +64,18 @@ proc `<-`(candidates: var Table[string, seq[string]], path: string) =
   if candidates.hasKeyOrPut(name, @[path]):
     candidates[name].add path
 
+
+func projectFromSession(s: TmuxSession): Project =
+  result.name = s.name
+  result.open = true
+  result.tmuxinfo = s.info
+
+
+
 proc findProjects*(open: bool = false): seq[Project] =
   let tsmConfig = loadTsmConfig()
   var candidates: Table[string, seq[string]]
-  var sessions = tmux.sessions.toHashSet()
+  var sessions = tmux.sessions.mapIt(it.name).toHashSet()
 
   for devDir in tsmConfig.paths:
     for (kind, path) in walkDir(devDir):
@@ -109,7 +116,8 @@ proc findProjects*(open: bool = false): seq[Project] =
         else: cmp(y.updated, x.updated)
 
   if sessions.len > 0:
-    result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
+    result = tmux.sessions.filterIt(it.name in sessions).mapIt(projectFromSession(it)) & result
+    # result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
 
   if len(result) == 0:
     termError "nothing to select, check your [yellow]$TSM_PATHS"

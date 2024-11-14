@@ -1,3 +1,4 @@
+import std/sequtils
 import ./[selector, project, tmuxutils]
 import hwylterm, hwylterm/hwylcli
 
@@ -7,7 +8,7 @@ proc tsm(open: bool = false) =
     project = selectProject projects
     selected = project.name
 
-  if selected notin tmux.sessions:
+  if selected notin tmux.sessions.mapIt(it.name):
     tmux.new(project.name, project.location)
   else:
     tmux.attach project.name
