@@ -69,6 +69,8 @@ proc display(s: State, p: Project): Bbstring =
     # will fail without clip!
     result.add p.tmuxinfo.bb("faint")
 
+  result.truncate(state.buffer.width - 5)
+
 func addLine(b: var Buffer, text: string) =
   b.buffer.add ("  " & text).alignLeft(b.width) & "\n"
 

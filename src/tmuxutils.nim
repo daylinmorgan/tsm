@@ -34,7 +34,6 @@ template cmd(tmux: Tmux, args: string) =
   let code = execCmd "tmux " & args
   if code != 0:
     tmuxError(args)
-  # discard tmux.cmdGet args
 
 proc toSession(s: string): TmuxSession = 
   let ss = s.split(":", 1)
