@@ -43,7 +43,7 @@
           pname = "tsm";
           version = "2024.1001-unstable";
           src = ../.;
-          nimbleDepsHash = "sha256-5xK3KsLLFZ72qWreIHW0SBL3+5H6Ll6o0spMfW1iPX8=";
+          nimbleDepsHash = "sha256-Z+KX1r4tpLQc3hTp2HYI6aLM2cwUCFlWIU8QP/Jx7h4=";
           nimFlags = [
             "-d:TsmVersion=v${version}"
           ];
