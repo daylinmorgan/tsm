@@ -71,6 +71,15 @@ func projectFromSession(s: TmuxSession): Project =
   result.tmuxinfo = s.info
 
 
+proc addInfo(project: var seq[Project]) =
+  ## naive fix to adding tmuxinfo until I rewrite findProjects
+  let sessions = collect:
+    for s in tmux.sessions:
+      {s.name: s}
+  for p in project.mitems:
+    if p.name in sessions:
+      p.tmuxinfo = sessions[p.name].info
+
 
 proc findProjects*(open: bool = false): seq[Project] =
   let tsmConfig = loadTsmConfig()
@@ -117,10 +126,11 @@ proc findProjects*(open: bool = false): seq[Project] =
 
   if sessions.len > 0:
     result = tmux.sessions.filterIt(it.name in sessions).mapIt(projectFromSession(it)) & result
-    # result = sessions.toSeq().mapIt(newUnknownProject(it)) & result
 
   if len(result) == 0:
     termError "nothing to select, check your [yellow]$TSM_PATHS"
     termEcho "searched these directories: "
     echo getTsmDirs().mapIt("  " & it).join("\n")
     quit QuitFailure
+
+  addInfo result
