@@ -1,14 +1,9 @@
-import std/sequtils
-import ./[selector, project, tmuxutils]
+import std/[sequtils, os]
+import ./[selector, project, tmuxutils, term]
 import hwylterm, hwylterm/hwylcli
 
-proc tsm(open: bool = false) =
-  let
-    projects = findProjects(open)
-    project = selectProject projects
-    selected = project.name
-
-  if selected notin tmux.sessions.mapIt(it.name):
+proc tsm(project: Project) =
+  if project.name notin tmux.sessions.mapIt(it.name):
     tmux.new(project.name, project.location)
   else:
     tmux.attach project.name
@@ -20,7 +15,23 @@ hwylCli:
   name "tsm"
   V tsmVersion
   flags:
-    open "only search open sessions"
+    open:
+      ? "only search open sessions"
+      - o
+    new:
+      ? "open session in current directory"
+      - n
   run:
-    tsm(open)
+    if new and open:
+      termQuit "--new and --open are mutually exclusive"
+
+    let project =
+      if new: newProject(
+        path = getCurrentDir(),
+        open = false,
+      )
+      else:
+        selectProject findProjects(open)
+
+    tsm(project)
 
