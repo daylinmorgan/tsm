@@ -8,7 +8,7 @@ task debugSelect, "debug select":
 
 task release, "build release assets w/forge":
   version = (gorgeEx "git describe --tags --always --match 'v*'").output
-  exec &"forge release -v {version} -V"
+  exec &"forge release -v --version {version}"
 
 task bundle, "package forge build assets":
   withDir "dist":
