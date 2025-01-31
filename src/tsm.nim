@@ -13,14 +13,13 @@ const tsmVersion {.strDefine.} =
 
 hwylCli:
   name "tsm"
-  V tsmVersion
+  settings InferShort
+  version tsmVersion
   flags:
     open:
       ? "only search open sessions"
-      - o
     new:
       ? "open session in current directory"
-      - n
   run:
     if new and open:
       termQuit "--new and --open are mutually exclusive"
