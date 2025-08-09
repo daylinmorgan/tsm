@@ -1,6 +1,6 @@
 # Package
 
-version       = "2025.1002"
+version       = "2025.1003"
 author        = "Daylin Morgan"
 description   = "tmux session manager"
 license       = "MIT"
