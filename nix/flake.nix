@@ -41,7 +41,7 @@
       packages = forAllSystems (pkgs: {
         tsm = pkgs.buildNimblePackage rec {
           pname = "tsm";
-          version = "2024.1001-unstable";
+          version = "2025.1004-unstable";
           src = ../.;
           nimbleDepsHash = "sha256-Oo5a88SnjOyIwsGfn2sMfwkzptEt66qfW40JmW2GXsM=";
           nimFlags = [
