@@ -32,11 +32,15 @@ proc loadConfigFile(): TsmConfig =
         result.paths.add p.value.strip().expandTilde() # usu is adding a newline....
     if "sessions" in topFields:
       for session in usuNode.fields["sessions"].elems:
-        result.sessions.add Session(
+        let
           # usu parser is leaving a newline at the end of first value in array?
-          name: session.fields["name"].value.strip(),
-          path: session.fields["path"].value.expandTilde()
-        )
+          name = session.fields["name"].value.strip()
+          path = session.fields["path"].value.expandTilde()
+        if not dirExists path:
+          termError fmt"{path} does not exist ignoring session {session}"
+          continue
+
+        result.sessions.add Session(name: name, path: path)
 
 
 
