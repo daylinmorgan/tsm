@@ -7,11 +7,26 @@ const
   prefix = "[cyan]tsm[/]" & sep
   errPrefix = prefix & "[red]error[/]" & sep
 
+let
+  errPrefixLen = bb(errPrefix).len
+  prefixLen = bb(prefix).len
+
+proc indentForPrefix(s: string, length: Natural): string =
+  if "\n" notin s: return s
+  let lines = s.splitLines()
+  result.add lines[0]
+  result.add "\n"
+  for i, l in lines[1..^1]:
+    result.add " ".repeat(length)
+    result.add l
+    if i != lines.len - 2:
+      result.add "\n"
+
 proc termEcho*(x: varargs[string, `$`]) =
-  bbEcho prefix, x.join(" ")
+  bbEcho prefix, x.join(" ").indentForPrefix(prefixLen)
 
 proc termError*(x: varargs[string, `$`]) =
-  bbEcho errPrefix, x.join(" ")
+  bbEcho errPrefix, x.join(" ").indentForPrefix(errPrefixLen)
 
 proc termQuit*(x: varargs[string, `$`]) =
   termError x

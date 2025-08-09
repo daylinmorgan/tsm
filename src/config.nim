@@ -22,7 +22,6 @@ proc loadUsuFile(p: string): UsuNode =
       termQuit fmt("failed to load config file\npath: {configPath}\nmessage: ") & getCurrentExceptionMsg()
 
 
-
 proc loadConfigFile(): TsmConfig =
   if fileExists(configPath):
     let usuNode = loadUsuFile(configPath)
@@ -37,7 +36,11 @@ proc loadConfigFile(): TsmConfig =
           name = session.fields["name"].value.strip()
           path = session.fields["path"].value.expandTilde()
         if not dirExists path:
-          termError fmt"{path} does not exist ignoring session {session}"
+          termError (
+            fmt"ignoring session: [yellow]{name}[/]" &
+            "\n" &
+            fmt"path: [b]{path}[/] does not exist"
+          )
           continue
 
         result.sessions.add Session(name: name, path: path)
