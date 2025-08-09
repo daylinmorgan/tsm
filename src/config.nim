@@ -19,7 +19,9 @@ proc loadUsuFile(p: string): UsuNode =
   try:
       return parseUsu(readFile p)
   except:
-      termQuit fmt"failed to load config file\npath: {configPath}\nmessage: " & getCurrentExceptionMsg()
+      termQuit fmt("failed to load config file\npath: {configPath}\nmessage: ") & getCurrentExceptionMsg()
+
+
 
 proc loadConfigFile(): TsmConfig =
   if fileExists(configPath):
