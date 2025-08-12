@@ -28,6 +28,7 @@
             overlays = [nim2nix.overlays.default];
           }
         ));
+      rev = toString (self.shortRev or self.dirtyShortRev or self.lastModified or "unknown");
     in
     {
       devShells = forAllSystems (pkgs: {
@@ -41,7 +42,7 @@
       packages = forAllSystems (pkgs: {
         tsm = pkgs.buildNimblePackage rec {
           pname = "tsm";
-          version = "2025.1004-unstable";
+          version = "2025.1004-unstable-${rev}"  ;
           src = ../.;
           nimbleDepsHash = "sha256-Oo5a88SnjOyIwsGfn2sMfwkzptEt66qfW40JmW2GXsM=";
           nimFlags = [
