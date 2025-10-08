@@ -1,9 +1,10 @@
 import std/[os, sequtils, strformat, strutils, tables]
 import usu
 import term
+from usu/parser import UsuParserError, UsuNodeKind
 
 type
-  TsmConfig* = object
+  Config* = object
     paths*: seq[string]
     sessions*: seq[Session]
 
@@ -12,47 +13,71 @@ type
 
 var configPath = getEnv("TSM_CONFIG", getConfigDir() / "tsm" / "config.usu")
 
-proc sessionNames*(tc: TsmConfig): seq[string] =
-  tc.sessions.mapIt(it.name)
+proc sessionNames*(c: Config): seq[string] =
+  for s in c.sessions:
+    result.add s.name
 
-proc loadUsuFile(p: string): UsuNode =
+template checkKind(node: UsuNode, k: UsuNodeKind) =
+  if node.kind != k:
+    raise newException(UsuParserError, "Expected node kind: " & $k & ", got: " & $node.kind & ", node: " & $node)
+
+proc parseHook(s: var string, node: UsuNode) =
+  checkKind node, UsuValue
+  s = node.value
+
+proc parseHook(s: var bool, node: UsuNode) =
+  checkKind node, UsuValue
+  s = parseBool(node.value)
+
+proc parseHook[T](s: var seq[T], node: UsuNode) =
+  checkKind node, UsuArray
+  for n in node.elems:
+    var e: T
+    parseHook(e, n)
+    s.add e
+
+proc parseHook(o: var object, node: UsuNode) =
+  checkKind node, UsuMap
+  for name, value in o.fieldPairs:
+    if name in node.fields:
+      parseHook(value, node.fields[name])
+
+proc to[T](node: UsuNode, t: typedesc[T]): T =
+  parseHook(result, node)
+
+proc loadConfigFile(): Config =
   try:
-      return parseUsu(readFile p)
+    return parseUsu(readFile configPath).to(type(result))
   except:
-      termQuit fmt("failed to load config file\npath: {configPath}\nmessage: ") & getCurrentExceptionMsg()
+    termQuit fmt("failed to load config file\npath: {configPath}\nmessage: ") & getCurrentExceptionMsg()
 
 
-proc loadConfigFile(): TsmConfig =
+proc finalize*(c: Config): Config =
+  for p in c.paths:
+    result.paths.add p.strip().expandTilde()
+  for session in c.sessions:
+    let name = session.name.strip()
+    let path = session.path.expandTilde()
+    if not dirExists path:
+      termError (
+        fmt"ignoring session: [yellow]{name}[/]" &
+        "\n" &
+        fmt"path: [b]{path}[/] does not exist"
+      )
+      continue
+    result.sessions.add Session(name: name, path: path)
+
+proc loadTsmConfig*(): Config =
   if fileExists(configPath):
-    let usuNode = loadUsuFile(configPath)
-    let topFields = usuNode.fields
-    if "paths" in topFields:
-      for p in usuNode.fields["paths"].elems:
-        result.paths.add p.value.strip().expandTilde() # usu is adding a newline....
-    if "sessions" in topFields:
-      for session in usuNode.fields["sessions"].elems:
-        let
-          # usu parser is leaving a newline at the end of first value in array?
-          name = session.fields["name"].value.strip()
-          path = session.fields["path"].value.expandTilde()
-        if not dirExists path:
-          termError (
-            fmt"ignoring session: [yellow]{name}[/]" &
-            "\n" &
-            fmt"path: [b]{path}[/] does not exist"
-          )
-          continue
-
-        result.sessions.add Session(name: name, path: path)
-
-
-
-proc loadTsmConfig*(): TsmConfig =
-  result = loadConfigFile()
+    result = loadConfigFile()
   let tsmDirs = getEnv("TSM_PATHS")
   if tsmDirs != "":
     result.paths = tsmDirs.split(":")
 
+  result = result.finalize()
+
 when isMainModule:
   echo loadConfigFile()
+  echo loadTsmConfig()
+
 
