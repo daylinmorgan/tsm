@@ -27,12 +27,6 @@ proc newUnknownProject*(name: string): Project =
   result.name = name
   result.open = true
 
-proc getTsmDirs(): seq[string] =
-  let tsmDirs = getEnv("TSM_PATHS")
-  if tsmDirs == "":
-    termQuit "Please set [yellow]$TSM_PATHS[/] to a colon-delimited list of paths"
-  result = tsmDirs.split(":")
-
 proc findDuplicateProjects(
     paths: seq[string],
     sessions: var HashSet[string]
@@ -128,9 +122,11 @@ proc findProjects*(open: bool = false): seq[Project] =
     result = tmux.sessions.filterIt(it.name in sessions).mapIt(projectFromSession(it)) & result
 
   if len(result) == 0:
+    if open:
+      termQuit "no open sessions"
     termError "nothing to select, check your [yellow]$TSM_PATHS"
     termEcho "searched these directories: "
-    echo getTsmDirs().mapIt("  " & it).join("\n")
+    echo tsmConfig.paths.mapIt("  " & it).join("\n")
     quit QuitFailure
 
   addInfo result

@@ -1,4 +1,4 @@
-import std/[os, sequtils, strformat, strutils, tables]
+import std/[os, strformat, strutils, tables]
 import usu
 import term
 from usu/parser import UsuParserError, UsuNodeKind
