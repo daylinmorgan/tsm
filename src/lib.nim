@@ -1,6 +1,6 @@
 import std/[os, osproc, strformat, strutils, sequtils]
-
-import term
+import ./[config, term]
+export config, term
 
 type
   TmuxSession* = object

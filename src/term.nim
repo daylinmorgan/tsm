@@ -1,4 +1,4 @@
-import std/strutils
+import std/[strutils]
 import hwylterm
 export hwylterm
 
@@ -23,11 +23,12 @@ proc indentForPrefix(s: string, length: Natural): string =
       result.add "\n"
 
 proc termEcho*(x: varargs[string, `$`]) =
-  bbEcho prefix, x.join(" ").indentForPrefix(prefixLen)
+  hecho prefix, x.join(" ").indentForPrefix(prefixLen)
 
 proc termError*(x: varargs[string, `$`]) =
-  bbEcho errPrefix, x.join(" ").indentForPrefix(errPrefixLen)
+  hecho errPrefix, x.join(" ").indentForPrefix(errPrefixLen)
 
 proc termQuit*(x: varargs[string, `$`]) =
   termError x
   quit QuitFailure
+

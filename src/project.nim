@@ -1,5 +1,5 @@
 import std/[algorithm, os, sequtils, sets, strutils, sugar, tables, times]
-import tmuxutils, term, config
+import ./lib
 
 type
   Project* = object
@@ -98,10 +98,8 @@ proc findProjectsFromPaths(paths: seq[string], openSessions: var HashSet[string]
     else:
       result.add findDuplicateProjects(paths, openSessions)
 
-
 proc findProjects*(open: bool = false): seq[Project] =
   let config = loadTsmConfig()
-  var candidates: Table[string, seq[string]]
   var openSessions= tmux.sessions.mapIt(it.name).toHashSet()
  
   result.add findProjectsFromPaths(config.paths, openSessions)

@@ -3,6 +3,7 @@ import usu
 import term
 from usu/parser import UsuParserError, UsuNodeKind
 
+
 type
   Config* = object
     paths*: seq[string]

@@ -1,7 +1,7 @@
 import std/[enumerate, os, strformat, strutils, terminal]
 import hwylterm
 from hwylterm/vendor/illwill import illwillDeinit, illwillInit, getKey, Key
-import term, project
+import ./[lib, project]
 
 func toStr(k: Key): string =
   $chr(ord(k))

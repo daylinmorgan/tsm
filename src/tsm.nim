@@ -1,5 +1,5 @@
 import std/[sequtils, os]
-import ./[selector, project, tmuxutils, term]
+import ./[selector, project, lib]
 import hwylterm, hwylterm/hwylcli
 
 proc tsm(project: Project) =
@@ -16,13 +16,11 @@ hwylCli:
   settings InferShort
   version tsmVersion
   flags:
-    open:
-      ? "only search open sessions"
-    new:
-      ? "open session in current directory"
+    open "only search open sessions"
+    new "open session in current directory"
   run:
     if new and open:
-      termQuit "--new and --open are mutually exclusive"
+      hwylCliError(bb"[b]--new[/] and [b]--open[/] are mutually exclusive")
 
     let project =
       if new: newProject(
