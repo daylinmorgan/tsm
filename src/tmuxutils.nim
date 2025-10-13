@@ -9,7 +9,7 @@ type
   Tmux* = object
     active*: bool
     sessions*: seq[TmuxSession]
- 
+
 proc checkExe(names: varargs[string]) =
   for name in names:
     if findExe(name) == "":

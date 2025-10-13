@@ -74,14 +74,15 @@ proc addInfo(project: var seq[Project]) =
     if p.name in sessions:
       p.tmuxinfo = sessions[p.name].info
 
+proc newConfiguredProjects(c: Config, openSessions: HashSet[string]): seq[Project] =
+  for session in c.sessions:
+    if session.name notin openSessions:
+      result.add newProject(path = session.path, open= false, name = session.name, named = true)
 
-proc findProjects*(open: bool = false): seq[Project] =
-  let tsmConfig = loadTsmConfig()
+proc findProjectsFromPaths(paths: seq[string], openSessions: var HashSet[string]): seq[Project] =
   var candidates: Table[string, seq[string]]
-  var sessions = tmux.sessions.mapIt(it.name).toHashSet()
-
-  for devDir in tsmConfig.paths:
-    for (kind, path) in walkDir(devDir):
+  for d in paths:
+    for (kind, path) in walkDir(d):
       if ({kind} * {pcFile, pcLinkToFile}).len > 0 or path.splitPath.tail.startsWith("."):
         continue
       candidates <- path
@@ -90,22 +91,24 @@ proc findProjects*(open: bool = false): seq[Project] =
     if len(paths) == 1:
       let
         path = paths[0]
-        open = path.pathToName in sessions
+        open = path.pathToName in openSessions
       result.add newProject(path, open)
       if open:
-        sessions.excl path.pathToName
+        openSessions.excl path.pathToName
     else:
-      result &= findDuplicateProjects(paths, sessions)
+      result.add findDuplicateProjects(paths, openSessions)
 
-  for session in tsmConfig.sessions:
-    if session.name notin sessions:
-      result.add newProject(
-        path = session.path, open = false, name = session.name, named = true
-      )
 
-  if open:
-    result = result.filterIt(it.open)
-  let sessionNames = tsmConfig.sessionNames
+proc findProjects*(open: bool = false): seq[Project] =
+  let config = loadTsmConfig()
+  var candidates: Table[string, seq[string]]
+  var openSessions= tmux.sessions.mapIt(it.name).toHashSet()
+ 
+  result.add findProjectsFromPaths(config.paths, openSessions)
+  result.add newConfiguredProjects(config, openSessions)
+
+  if open: result = result.filterIt(it.open)
+  let sessionNames = config.sessionNames
 
   # order open -> configured -> mod time
   result.sort do(x, y: Project) -> int:
@@ -118,15 +121,16 @@ proc findProjects*(open: bool = false): seq[Project] =
         elif x.name in sessionNames: -1
         else: cmp(y.updated, x.updated)
 
-  if sessions.len > 0:
-    result = tmux.sessions.filterIt(it.name in sessions).mapIt(projectFromSession(it)) & result
+  # add the remaining open sessions I didn't create
+  if openSessions.len > 0:
+    result = tmux.sessions.filterIt(it.name in openSessions).mapIt(projectFromSession(it)) & result
 
   if len(result) == 0:
     if open:
       termQuit "no open sessions"
     termError "nothing to select, check your [yellow]$TSM_PATHS"
     termEcho "searched these directories: "
-    echo tsmConfig.paths.mapIt("  " & it).join("\n")
+    echo config.paths.mapIt("  " & it).join("\n")
     quit QuitFailure
 
   addInfo result
