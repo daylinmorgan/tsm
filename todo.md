@@ -4,5 +4,6 @@
 - [x] add open session info as faint text -> "session: 2 windows (created ......)"
     - [x] include this info for the configured but open sessions too
 - [x] add `-n,--new` flag to emulate `Ctrl+E` behavior
+- [ ] don't show current session in picker
 
 <!-- generated with <3 by daylinmorgan/todo -->
