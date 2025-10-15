@@ -6,6 +6,7 @@ type
   TmuxSession* = object
     name*: string
     info*: string
+    current*: bool
   Tmux* = object
     active*: bool
     sessions*: seq[TmuxSession]
@@ -35,18 +36,26 @@ template cmd(tmux: Tmux, args: string) =
   if code != 0:
     tmuxError(args)
 
-proc toSession(s: string): TmuxSession = 
+proc toSession(s: string): TmuxSession =
   let ss = s.split(":", 1)
   if ss.len != 2:
     tmuxError "failed to parse session info from: " & s
   result.name = ss[0]
   result.info = ss[1]
 
+proc getSessions(tmux: var Tmux) =
+  let currentName = tmux.cmdGet "display-message -p '#S'"
+  for info in tmux.cmdGet("list-sessions").strip().splitLines():
+    var session = toSession(info)
+    if session.name == currentName:
+      session.current = true
+    tmux.sessions.add session
+
 proc newTmux(): Tmux =
   result.active = existsEnv("TMUX")
   # check if server is active
   if execCmdEx("tmux run").exitCode == 0:
-    result.sessions = (result.cmdGet "list-sessions").strip().split("\n").mapIt(toSession(it))
+    result.getSessions()
 
 proc attach*(t: Tmux, session: string) =
   let args = if t.active: "switch-client -t" else: "attach -t"
