@@ -1,0 +1,51 @@
+{
+  "items": {
+    "hwylterm.daylinmorgan.github.com": {
+      "dir": "$deps/hwylterm.daylinmorgan.github.com",
+      "url": "https://github.com/daylinmorgan/hwylterm",
+      "commit": "2b64843f9c8f12ddbc84b84e6aae18307b0a4dc0",
+      "version": ""
+    },
+    "usu-nim.usu-dev.github.com": {
+      "dir": "$deps/usu-nim.usu-dev.github.com",
+      "url": "https://github.com/usu-dev/usu-nim",
+      "commit": "ab2406bd5b857f44c9ebee8ed5f7287b30e089dd",
+      "version": ""
+    }
+  },
+  "nimcfg": [
+    "############# begin Atlas config section ##########",
+    "--noNimblePath",
+    "--path:\"deps/hwylterm.daylinmorgan.github.com/src\"",
+    "--path:\"deps/usu-nim.usu-dev.github.com/src\"",
+    "############# end Atlas config section   ##########",
+    ""
+  ],
+  "nimbleFile": {
+    "filename": "tsm.nimble",
+    "content": [
+      "# Package",
+      "",
+      "version       = \"2025.1004\"",
+      "author        = \"Daylin Morgan\"",
+      "description   = \"tmux session manager\"",
+      "license       = \"MIT\"",
+      "srcDir        = \"src\"",
+      "bin           = @[\"tsm\"]",
+      "binDir        = \"bin\"",
+      "",
+      "# Dependencies",
+      "",
+      "requires \"nim >= 2.0.0\"",
+      "requires \"https://github.com/daylinmorgan/hwylterm#HEAD\"",
+      "requires \"https://github.com/usu-dev/usu-nim#HEAD\"",
+      "",
+      ""
+    ]
+  },
+  "hostOS": "linux",
+  "hostCPU": "amd64",
+  "nimVersion": "2.2.4",
+  "gccVersion": "14.3.0",
+  "clangVersion": ""
+}

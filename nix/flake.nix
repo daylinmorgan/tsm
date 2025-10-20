@@ -35,16 +35,19 @@
         default = pkgs.mkShell {
           packages = with pkgs; [
             nim
-            nimble
+            nim-atlas # from overlay
           ];
+        shellHook= ''
+          echo -e "\n\nget started by running 'atlas rep' if needed"
+        '';
         };
       });
       packages = forAllSystems (pkgs: {
-        tsm = pkgs.buildNimblePackage rec {
+        tsm = pkgs.buildAtlasPackage rec {
           pname = "tsm";
           version = "2025.1004-unstable-${rev}"  ;
           src = ../.;
-          nimbleDepsHash = "sha256-Oo5a88SnjOyIwsGfn2sMfwkzptEt66qfW40JmW2GXsM=";
+          atlasDepsHash = "sha256-sifrhLuGPI2+ncE0ZGHZdrS9DUSC+d1VFP8Kpp5sZr8=";
           nimFlags = [
             "-d:TsmVersion=v${version}"
           ];

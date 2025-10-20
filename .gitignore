@@ -9,3 +9,7 @@ nimble.paths
 
 result
 src/selector
+
+# atlas
+deps
+nim.cfg
