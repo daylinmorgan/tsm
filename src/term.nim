@@ -3,9 +3,9 @@ import hwylterm
 export hwylterm
 
 const
-  sep = " [magenta]|[/] "
-  prefix = "[cyan]tsm[/]" & sep
-  errPrefix = prefix & "[red]error[/]" & sep
+  sep = bb" [magenta]|[/] "
+  prefix = bb"[cyan]tsm[/]" & sep
+  errPrefix = prefix & bb"[red]error[/]" & sep
 
 let
   errPrefixLen = bb(errPrefix).len
