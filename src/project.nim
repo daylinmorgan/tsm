@@ -126,9 +126,10 @@ proc findProjects*(open: bool = false): seq[Project] =
   if len(result) == 0:
     if open:
       termQuit "no open sessions"
-    termError "nothing to select, check your [yellow]$TSM_PATHS"
-    termEcho "searched these directories: "
-    echo config.paths.mapIt("  " & it).join("\n")
+    termError bb"nothing to select, check your [yellow]$TSM_PATHS[/]"
+    if config.paths.len > 0:
+      termEcho "searched these directories: "
+      echo config.paths.mapIt("  " & it).join("\n")
     quit QuitFailure
 
   addInfo result
