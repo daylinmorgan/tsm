@@ -3,7 +3,7 @@
     "hwylterm.daylinmorgan.github.com": {
       "dir": "$deps/hwylterm.daylinmorgan.github.com",
       "url": "https://github.com/daylinmorgan/hwylterm",
-      "commit": "2b64843f9c8f12ddbc84b84e6aae18307b0a4dc0",
+      "commit": "062e30cb4d6d195d19b3850c3ee2a10fa00bac9c",
       "version": ""
     },
     "usu-nim.usu-dev.github.com": {
