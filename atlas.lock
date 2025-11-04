@@ -3,13 +3,13 @@
     "hwylterm.daylinmorgan.github.com": {
       "dir": "$deps/hwylterm.daylinmorgan.github.com",
       "url": "https://github.com/daylinmorgan/hwylterm",
-      "commit": "062e30cb4d6d195d19b3850c3ee2a10fa00bac9c",
+      "commit": "3e25dbd1fc968b7df566b9ac432f3f31ab9a9362",
       "version": ""
     },
     "usu-nim.usu-dev.github.com": {
       "dir": "$deps/usu-nim.usu-dev.github.com",
       "url": "https://github.com/usu-dev/usu-nim",
-      "commit": "ab2406bd5b857f44c9ebee8ed5f7287b30e089dd",
+      "commit": "c113c6282178b874cc37ef70d2b2b2524849d277",
       "version": ""
     }
   },
