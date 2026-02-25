@@ -1,23 +1,23 @@
 {
   "items": {
     "hwylterm.daylinmorgan.github.com": {
-      "dir": "$deps/hwylterm.daylinmorgan.github.com",
+      "dir": "$deps/hwylterm",
       "url": "https://github.com/daylinmorgan/hwylterm",
       "commit": "3e25dbd1fc968b7df566b9ac432f3f31ab9a9362",
       "version": ""
     },
     "usu-nim.usu-dev.github.com": {
-      "dir": "$deps/usu-nim.usu-dev.github.com",
+      "dir": "$deps/usu-nim",
       "url": "https://github.com/usu-dev/usu-nim",
-      "commit": "c113c6282178b874cc37ef70d2b2b2524849d277",
+      "commit": "27d1f89790239bd056cb7669db6b5bf3bf5e2a6e",
       "version": ""
     }
   },
   "nimcfg": [
     "############# begin Atlas config section ##########",
     "--noNimblePath",
-    "--path:\"deps/hwylterm.daylinmorgan.github.com/src\"",
-    "--path:\"deps/usu-nim.usu-dev.github.com/src\"",
+    "--path:\"deps/hwylterm/src\"",
+    "--path:\"deps/usu-nim/src\"",
     "############# end Atlas config section   ##########",
     ""
   ],
@@ -37,8 +37,8 @@
       "# Dependencies",
       "",
       "requires \"nim >= 2.0.0\"",
-      "requires \"https://github.com/daylinmorgan/hwylterm#HEAD\"",
-      "requires \"https://github.com/usu-dev/usu-nim#HEAD\"",
+      "requires \"https://github.com/daylinmorgan/hwylterm#head\"",
+      "requires \"https://github.com/usu-dev/usu-nim#head\"",
       "",
       ""
     ]
@@ -46,6 +46,6 @@
   "hostOS": "linux",
   "hostCPU": "amd64",
   "nimVersion": "2.2.4",
-  "gccVersion": "14.3.0",
+  "gccVersion": "15.2.0",
   "clangVersion": ""
 }

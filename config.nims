@@ -19,10 +19,3 @@ task bundle, "package forge build assets":
         else: &"tar czf {dir}.tar.gz {dir}"
       cpFile("../README.md", &"{dir}/README.md")
       exec cmd
-
-
-# begin Nimble config (version 2)
---noNimblePath
-when withDir(thisDir(), system.fileExists("nimble.paths")):
-  include "nimble.paths"
-# end Nimble config

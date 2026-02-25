@@ -11,6 +11,6 @@ binDir        = "bin"
 # Dependencies
 
 requires "nim >= 2.0.0"
-requires "https://github.com/daylinmorgan/hwylterm#HEAD"
-requires "https://github.com/usu-dev/usu-nim#HEAD"
+requires "https://github.com/daylinmorgan/hwylterm#head"
+requires "https://github.com/usu-dev/usu-nim#head"
 
