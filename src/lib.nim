@@ -1,4 +1,4 @@
-import std/[os, osproc, strformat, strutils, sequtils]
+import std/[os, osproc, strformat, strutils]
 import ./[config, term]
 export config, term
 

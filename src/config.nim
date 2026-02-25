@@ -1,7 +1,6 @@
-import std/[os, strformat, strutils, tables]
+import std/[os, strformat, strutils]
 import usu
-import term
-from usu/parser import UsuParserError, UsuNodeKind
+import ./term
 
 
 type
@@ -17,34 +16,6 @@ var configPath = getEnv("TSM_CONFIG", getConfigDir() / "tsm" / "config.usu")
 proc sessionNames*(c: Config): seq[string] =
   for s in c.sessions:
     result.add s.name
-
-template checkKind(node: UsuNode, k: UsuNodeKind) =
-  if node.kind != k:
-    raise newException(UsuParserError, "Expected node kind: " & $k & ", got: " & $node.kind & ", node: " & $node)
-
-proc parseHook(s: var string, node: UsuNode) =
-  checkKind node, UsuValue
-  s = node.value
-
-proc parseHook(s: var bool, node: UsuNode) =
-  checkKind node, UsuValue
-  s = parseBool(node.value)
-
-proc parseHook[T](s: var seq[T], node: UsuNode) =
-  checkKind node, UsuArray
-  for n in node.elems:
-    var e: T
-    parseHook(e, n)
-    s.add e
-
-proc parseHook(o: var object, node: UsuNode) =
-  checkKind node, UsuMap
-  for name, value in o.fieldPairs:
-    if name in node.fields:
-      parseHook(value, node.fields[name])
-
-proc to[T](node: UsuNode, t: typedesc[T]): T =
-  parseHook(result, node)
 
 proc loadConfigFile(): Config =
   try:
