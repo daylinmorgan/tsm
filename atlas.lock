@@ -6,10 +6,10 @@
       "commit": "3e25dbd1fc968b7df566b9ac432f3f31ab9a9362",
       "version": ""
     },
-    "usu-nim.usu-dev.github.com": {
-      "dir": "$deps/usu-nim",
+    "usu": {
+      "dir": "$deps/usu",
       "url": "https://github.com/usu-dev/usu-nim",
-      "commit": "27d1f89790239bd056cb7669db6b5bf3bf5e2a6e",
+      "commit": "c23d34baf922883ab0e299c8d304db32001bf3d8",
       "version": ""
     }
   },
@@ -17,7 +17,7 @@
     "############# begin Atlas config section ##########",
     "--noNimblePath",
     "--path:\"deps/hwylterm/src\"",
-    "--path:\"deps/usu-nim/src\"",
+    "--path:\"deps/usu/src\"",
     "############# end Atlas config section   ##########",
     ""
   ],
@@ -38,7 +38,7 @@
       "",
       "requires \"nim >= 2.0.0\"",
       "requires \"https://github.com/daylinmorgan/hwylterm#head\"",
-      "requires \"https://github.com/usu-dev/usu-nim#head\"",
+      "requires \"usu#head\"",
       "",
       ""
     ]
