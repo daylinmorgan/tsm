@@ -9,7 +9,7 @@
     "usu": {
       "dir": "$deps/usu",
       "url": "https://github.com/usu-dev/usu-nim",
-      "commit": "c23d34baf922883ab0e299c8d304db32001bf3d8",
+      "commit": "0a6b6bc9b1c151ff2404d6f9857b3c2626d1929f",
       "version": ""
     }
   },

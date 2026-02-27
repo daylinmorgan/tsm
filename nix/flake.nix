@@ -51,7 +51,7 @@
             pname = "tsm";
             version = "2025.1004-unstable-${rev}";
             src = ../.;
-            atlasDepsHash = "sha256-76hSjPOi3l5xif3fULrU2NkFeTEg0K3qKBM0VZi9TZ8=";
+            atlasDepsHash = "sha256-27KT28lgOHfTrZ79xDdoErV2VaWPhWL1H2A0fwVgNBw=";
             nimFlags = [
               "-d:TsmVersion=v${version}"
             ];
