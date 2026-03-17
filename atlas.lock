@@ -3,13 +3,13 @@
     "hwylterm.daylinmorgan.github.com": {
       "dir": "$deps/hwylterm",
       "url": "https://github.com/daylinmorgan/hwylterm",
-      "commit": "3e25dbd1fc968b7df566b9ac432f3f31ab9a9362",
+      "commit": "f6e3e6507a52cd0b068a60fb388cec352ec95784",
       "version": ""
     },
     "usu": {
       "dir": "$deps/usu",
       "url": "https://github.com/usu-dev/usu-nim",
-      "commit": "3ec00a855b406e058aa28f057208bedbcf04fbae",
+      "commit": "c672b064c401f5cac0efa15264b02f893ce8717f",
       "version": ""
     }
   },
