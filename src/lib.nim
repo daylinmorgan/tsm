@@ -19,10 +19,10 @@ proc checkExe(names: varargs[string]) =
 checkExe "tmux"
 
 proc tmuxError(args: string, output: string = "") =
-  termError "failed to run: [bold]tmux", args
+  termError bb"failed to run: [bold]tmux",  args
   if output != "":
     termError "see below for error"
-    echo output
+    hecho output
   quit QuitFailure
 
 proc cmdGet(tmux: Tmux, args: string): string =
@@ -59,13 +59,17 @@ proc newTmux(): Tmux =
 
 proc attach*(t: Tmux, session: string) =
   let args = if t.active: "switch-client -t" else: "attach -t"
-  t.cmd fmt"{args} {session}"
+  t.cmd fmt"{args} {session.quoteShell()}"
 
-proc new*(t: Tmux, session: string, loc: string) =
-  if t.active:
-    t.cmd fmt"new-session -d -s {session} -c {loc}"
-    t.attach session
-  else:
-    t.cmd fmt"new-session -s {session} -c {loc}"
+proc new*(t: Tmux, session: string, loc: string, windows: seq[Window] = @[]) =
+  t.cmd fmt"new-session -d -s {session.quoteShell()} -c {loc.quoteShell()}"
+  if windows.len > 0:
+    for w in windows:
+      var cmd = fmt"new-window -t {session.quoteShell()} -n {w.name.quoteShell()} -c {loc.quoteShell()}"
+      if w.exec != "":
+        cmd &= " " & quoteShell(w.exec)
+      t.cmd cmd
+  t.attach session
+
 
 let tmux* = newTmux()

@@ -4,7 +4,7 @@ import hwylterm, hwylterm/hwylcli
 
 proc tsm(project: Project) =
   if project.name notin tmux.sessions.mapIt(it.name):
-    tmux.new(project.name, project.location)
+    tmux.new(project.name, project.location, project.windows)
   else:
     tmux.attach project.name
 

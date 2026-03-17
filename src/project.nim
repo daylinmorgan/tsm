@@ -10,11 +10,13 @@ type
     open*: bool
     matched*: bool
     tmuxinfo*: string
+    windows*: seq[Window]
+
 
 proc pathToName*(path: string): string =
   splitPath(path)[1].replace(".", "_")
 
-proc newProject*(path: string, open: bool, name = "", named: bool = false): Project =
+proc newProject*(path: string, open: bool = false, name = "", named: bool = false): Project =
   result.location = path
   result.name =
     if name != "": name
@@ -27,43 +29,28 @@ proc newUnknownProject*(name: string): Project =
   result.name = name
   result.open = true
 
-proc findDuplicateProjects(
-    paths: seq[string],
-    sessions: var HashSet[string]
-): seq[Project] =
-  var candidates: Table[string, seq[string]]
-  for p in paths:
-    candidates[p] = p.split(DirSep)
+proc minParts(paths: seq[seq[string]]): int =
+  let max = paths.mapIt(it.len).min()
+  var i = 1
+  while i < max:
+    if paths.mapIt(it[^i..^1]).toHashSet().len() == paths.len:
+      return i
+    inc i
 
-  let maxExtra = min(candidates.values.toSeq.mapIt(it.len))
-  for i in 2..maxExtra:
-    let
-      deduplicated =
-        collect:
-          for path, pathSplit in candidates.pairs:
-            (name: pathSplit[^i..^1].joinPath, path: path)
-    if deduplicated.mapIt(it[0]).toHashSet.len == candidates.len:
-      for (name, path) in deduplicated:
-        let open = name in sessions
-        result.add newProject(path, open, name)
-        if open:
-          sessions.excl name
-      break
+  termQuit "failed to deduplicate these paths:" & paths.join(", ")
 
-  if result.len == 0:
-    termQuit "failed to deduplicate these paths:" & paths.join(", ")
+proc dedupedProjects( paths: seq[string]): seq[Project] =
+  let pathSplits = paths.mapIt(it.split('/'))
+  let nParts = minParts(pathSplits)
 
-proc `<-`(candidates: var Table[string, seq[string]], path: string) =
-  let name = path.splitPath.tail
-  if candidates.hasKeyOrPut(name, @[path]):
-    candidates[name].add path
-
+  for (p, s) in zip(paths, pathSplits):
+    let name = s[^nParts..^1].join("/")
+    result.add newProject(p, name = name)
 
 func projectFromSession(s: TmuxSession): Project =
   result.name = s.name
   result.open = true
   result.tmuxinfo = s.info
-
 
 proc addInfo(project: var seq[Project]) =
   ## naive fix to adding tmuxinfo until I rewrite findProjects
@@ -76,33 +63,69 @@ proc addInfo(project: var seq[Project]) =
 
 proc newConfiguredProjects(c: Config, openSessions: HashSet[string]): seq[Project] =
   for session in c.sessions:
+    # assume session with the same name is the configured session
     if session.name notin openSessions:
-      result.add newProject(path = session.path, open= false, name = session.name, named = true)
+      var p = newProject(path = session.path, name = session.name, named = true)
+      p.windows = session.windows
+      result.add p
 
-proc findProjectsFromPaths(paths: seq[string], openSessions: var HashSet[string]): seq[Project] =
-  var candidates: Table[string, seq[string]]
-  for d in paths:
-    for (kind, path) in walkDir(d):
-      if ({kind} * {pcFile, pcLinkToFile}).len > 0 or path.splitPath.tail.startsWith("."):
-        continue
-      candidates <- path
+type
+  PathTable = Table[string, seq[string]]
+
+proc `//`(a: var PathTable, b: PathTable) =
+  for k, v in b.pairs:
+    if a.hasKeyOrPut(k, v):
+      a[k].add v
+
+func pathToName(root: string, p: string): string =
+  let parts = p.split('/')
+  let n = parts.find(root)
+  result = parts[n..^1].join("/")
+
+proc getPaths(root: string, d: string, depth: Natural, level: Natural): PathTable =
+  for (kind, path) in walkDir(d):
+    # ignore files/links and hidden directories
+    if ({kind} * {pcFile, pcLinkToFile}).len > 0 or path.splitPath.tail.startsWith("."):
+      continue
+
+    if depth == level:
+      let name = (
+        if depth != 0: pathToName(root, path)
+        else: path.lastPathPart
+      ).replace(".", "_")
+      if result.hasKeyOrPut(name, @[path]):
+        result[name].add path
+    else:
+      let root = if level == 0: path.lastPathPart else: root
+      result // getPaths(root, path, depth, level + 1)
+
+proc getPaths(r: Root): PathTable =
+  let rootPath = r.path.lastPathPart
+  getPaths(rootPath, r.path, r.depth, 0)
+
+proc findProjectsFromRoots(roots: seq[Root], openSessions: var HashSet[string]): seq[Project] =
+  var candidates: PathTable
+  for root in roots:
+    candidates // getPaths(root)
 
   for name, paths in candidates.pairs:
     if len(paths) == 1:
-      let
-        path = paths[0]
-        open = path.pathToName in openSessions
-      result.add newProject(path, open)
-      if open:
-        openSessions.excl path.pathToName
+      result.add newProject(paths[0], name=name)
     else:
-      result.add findDuplicateProjects(paths, openSessions)
+      result.add dedupedProjects(paths)
+
+  # account for open sessions that overlap
+  for p in result.mitems:
+    if p.name in openSessions:
+      p.open = true
+      openSessions.excl p.name
+
 
 proc findProjects*(open: bool = false): seq[Project] =
   let config = loadTsmConfig()
   var openSessions= tmux.sessions.mapIt(it.name).toHashSet()
- 
-  result.add findProjectsFromPaths(config.paths, openSessions)
+
+  result.add findProjectsFromRoots(config.roots, openSessions)
   result.add newConfiguredProjects(config, openSessions)
 
   if open: result = result.filterIt(it.open)
@@ -126,10 +149,10 @@ proc findProjects*(open: bool = false): seq[Project] =
   if len(result) == 0:
     if open:
       termQuit "no open sessions"
-    termError bb"nothing to select, check your [yellow]$TSM_PATHS[/]"
-    if config.paths.len > 0:
+    termError bb"nothing to select, check your [yellow]$TSM_PATHS[/] or config file"
+    if config.roots.len > 0:
       termEcho "searched these directories: "
-      echo config.paths.mapIt("  " & it).join("\n")
+      hecho config.roots.mapIt("  " & it.path).join("\n")
     quit QuitFailure
 
   addInfo result
