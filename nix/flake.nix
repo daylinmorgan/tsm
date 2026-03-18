@@ -49,7 +49,7 @@
         system: pkgs: {
           tsm = pkgs.buildAtlasPackage rec {
             pname = "tsm";
-            version = "2025.1004-unstable-${rev}";
+            version = "2026.1005-unstable-${rev}";
             src = ../.;
             atlasDepsHash = "sha256-IeNfucVfp9oHWFTDgjbREKXPHKn3LSYscr2r8yDNonQ=";
             nimFlags = [
