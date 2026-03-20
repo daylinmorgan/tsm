@@ -3,13 +3,13 @@
     "hwylterm.daylinmorgan.github.com": {
       "dir": "$deps/hwylterm",
       "url": "https://github.com/daylinmorgan/hwylterm",
-      "commit": "f6e3e6507a52cd0b068a60fb388cec352ec95784",
+      "commit": "835af6557e6c934227c9369e45c54da2ca78e474",
       "version": ""
     },
     "usu": {
       "dir": "$deps/usu",
       "url": "https://github.com/usu-dev/usu-nim",
-      "commit": "c672b064c401f5cac0efa15264b02f893ce8717f",
+      "commit": "a8c83081e6ab53807b9aef921e10ca449ddffd0d",
       "version": ""
     }
   },
@@ -26,7 +26,7 @@
     "content": [
       "# Package",
       "",
-      "version       = \"2025.1004\"",
+      "version       = \"2026.1005\"",
       "author        = \"Daylin Morgan\"",
       "description   = \"tmux session manager\"",
       "license       = \"MIT\"",
