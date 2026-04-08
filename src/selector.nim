@@ -1,6 +1,6 @@
 import std/[enumerate, os, strformat, strutils, terminal]
 import hwylterm
-from hwylterm/vendor/illwill import illwillDeinit, illwillInit, getKey, Key
+from hwylterm/vendor/illwill import Key, getKey, illwillDeinit, illwillInit
 import ./[lib, project]
 
 func toStr(k: Key): string =

@@ -1,4 +1,4 @@
-import std/[strutils]
+import std/strutils
 import hwylterm
 export hwylterm
 

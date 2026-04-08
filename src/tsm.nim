@@ -1,6 +1,7 @@
-import std/[sequtils, os]
+import std/[os, sequtils]
+import hwylterm
+import hwylterm/hwylcli
 import ./[selector, project, lib]
-import hwylterm, hwylterm/hwylcli
 
 proc tsm(project: Project) =
   if project.name notin tmux.sessions.mapIt(it.name):
