@@ -3,6 +3,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nim2nix.url = "github:daylinmorgan/nim2nix";
+    nim2nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -51,7 +52,7 @@
             pname = "tsm";
             version = "2026.1005-unstable-${rev}";
             src = ../.;
-            atlasDepsHash = "sha256-zfpnww/wuk3W83IBy8TQyzdzypELtim/W8z6QaFRGos=";
+            atlasDepsHash = "sha256-VGgJqtgRJdpcvWge32/NzKUpUyrFDm9EVvl7hi6jspQ=";
             nimFlags = [
               "-d:TsmVersion=v${version}"
             ];
