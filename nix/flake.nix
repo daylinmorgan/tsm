@@ -52,7 +52,7 @@
             pname = "tsm";
             version = "2026.1005-unstable-${rev}";
             src = ../.;
-            atlasDepsHash = "sha256-VGgJqtgRJdpcvWge32/NzKUpUyrFDm9EVvl7hi6jspQ=";
+            atlasDepsHash = "sha256-+DbtJK3YwrFvFT3IUrx9l9+1DDMBxaqbpkJ+IdsLDNQ=";
             nimFlags = [
               "-d:TsmVersion=v${version}"
             ];
